@@ -1,0 +1,11 @@
+1. Open %USERPROFILE%\.quokka
+2. edit or add config below.
+    {
+        "pro":false,
+        "plugins": [ "jsdom-quokka-plugin" ],
+        "jsdom": { "config" : { "file": "./index.html" } }
+    }
+3. Run command: 
+   npm install jsdom-quokka-plugin
+4. Add index.html in target folder (root folder).
+5. Run quokka in VS Code.
