@@ -23,6 +23,9 @@
             left: 0;
             right: 0;
         }
+        .autocomplete-items.hide {
+            display: none;
+        }
         .autocomplete-items div {
             padding: 10px;
             cursor: pointer;
@@ -42,9 +45,10 @@
     <div style="margin-top: 10px;">
         <div class="autocomplete">
             <label for="txtSearch1">search:</label>
-            <input id="txtSearch1" type="text" style="width: 10rem; height: 1.4em;">
+            <input id="txtSearch1" type="text" style="width: 10rem; height: 1.4em;"
+                onfocus="gotfocus();" onblur="lostfocus();">
             <!-- create a DIV element that will contain the items (values). -->
-            <div id="txtSearch1-autocomplete-list" class="autocomplete-items">
+            <div id="txtSearch1-autocomplete-list" class="autocomplete-items hide">
                 <!-- for each item in the array. -->
                 <div>
                     item 1
@@ -77,12 +81,20 @@
     <script src="js/search.js"></script>
     <script>
         function changeType() {
-            var $input = $('#txtSearch');
+            var $input = $('#txtSearch2');
             $input.val(undefined);
             var attr = $input.attr('type');
             if (attr === 'text') $input.attr('type', 'date');
             else  $input.attr('type', 'text');
             $input.focus();
+        }
+        function gotfocus() {
+            var $input = $('#txtSearch1');
+            $input.parent().children('div').removeClass('hide');
+        }
+        function lostfocus() {
+            var $input = $('#txtSearch1');
+            $input.parent().children('div').addClass('hide');
         }
     </script>
 </body>
