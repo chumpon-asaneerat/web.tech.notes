@@ -1,0 +1,43 @@
+.auto-fill {
+    display: block;
+    margin: 0 auto;
+    padding: 2px 5px;
+    border: 1px solid silver;
+    cursor: text;
+    white-space: nowrap;
+}
+
+.auto-fill.focused {
+    border: 1px solid cornflowerblue;
+}
+
+.auto-fill span.input-text {
+    display: inline-block;
+    outline: none;
+    /* make it not wrap whitespace. */
+    white-space: pre;
+    /* make some space for display cursor when empty string. */
+    min-width: 1px;
+}
+
+.auto-fill span.suggest-text {
+    display: inline-block;
+    color: silver;
+    outline: none;
+    /* make it not wrap whitespace. */
+    white-space: pre;
+}
+
+.auto-fill .drop-panel {
+    display: block;
+    position: absolute;
+}
+
+.auto-fill-item {
+    display: block;
+    position: relative;
+}
+
+.auto-fill-item.hide {
+    display: none;
+}

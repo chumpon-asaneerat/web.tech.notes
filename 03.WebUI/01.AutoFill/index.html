@@ -6,96 +6,58 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Search suggestions.</title>
     <link rel="stylesheet" href="css/search.css">
-    <style>
-        .autocomplete {
-            /* the container must be positioned relative. */
-            position: relative;
-            display: inline-block;
-            margin: 0 auto;
-            padding: 0;
-        }
-        .autocomplete-items {
-            position: absolute;
-            z-index: 99;
-            border: 1px solid #d4d4d4;
-            /* position the autocomplete items to be the same width as the container. */
-            top: 100%;
-            left: 0;
-            right: 0;
-        }
-        .autocomplete-items.hide {
-            display: none;
-        }
-        .autocomplete-items div {
-            padding: 10px;
-            cursor: pointer;
-            background-color: #fff; 
-            border-bottom: 1px solid #d4d4d4;
-            opacity: 0.95;
-        }
-        .autocomplete-items div:hover {
-            /* when hovering an item. */
-            background-color: #e9e9e9; 
-        }
-    </style>
 </head>
 <body>
     <h3>Search suggestions.</h3>
     <!-- Concept -->
     <div style="margin-top: 10px;">
-        <div class="autocomplete">
-            <label for="txtSearch1">search:</label>
-            <input id="txtSearch1" type="text" style="width: 10rem; height: 1.4em;"
-                onfocus="gotfocus();" onblur="lostfocus();">
-            <!-- create a DIV element that will contain the items (values). -->
-            <div id="txtSearch1-autocomplete-list" class="autocomplete-items hide">
-                <!-- for each item in the array. -->
-                <div>
-                    item 1
-                    <input type='hidden' value="item 1">
-                </div>
-                <div>
-                    item 2
-                    <input type='hidden' value="item 2">
-                </div>
-                <div>
-                    item 3
-                    <input type='hidden' value="item 3">
-                </div>
-            </div>
+        <input type="text">        
+        <div id="txtSearch1">
         </div>
         <h4>Result:</h4>
     </div>
     <hr/>
-    <!-- Implementation -->
-    <button onclick="changeType();">Change Type</button>
-    <div style="margin-top: 10px;">
-        <label for="txtSearch2">search:</label>
-        <input id="txtSearch2" type="text" style="width: 10rem; height: 1.4em;">
-        <h4>Result:</h4>
-    </div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin fermentum ligula vel hendrerit porta. Aenean lectus mi,
+    mollis a lorem quis, dignissim facilisis erat. Donec quis tempus quam, in fermentum elit. Nullam auctor libero et
+    fringilla tempor. Etiam ultrices quam rhoncus ante mollis tempus. Nullam luctus elementum lorem, vitae euismod metus
+    sodales eget. Aliquam feugiat metus eu urna sollicitudin vestibulum. Nulla tempor ligula et dolor venenatis pulvinar.
+    Pellentesque aliquam mattis enim. Nulla facilisi. Integer neque magna, fringilla a lobortis a, finibus vel ex. Praesent
+    porta finibus arcu a facilisis. Nam ipsum ex, lacinia vel libero ac, eleifend suscipit quam. Quisque sit amet efficitur
+    tortor.
+    
+    Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Proin tristique pellentesque
+    libero vel ullamcorper. Etiam nec nibh ultrices, accumsan lacus sit amet, sodales sem. In eu rutrum sem. Proin
+    imperdiet, lacus sed tempus porttitor, ante nisl sodales nisi, quis ornare est sapien vel libero. Curabitur non
+    vulputate urna. Quisque a elementum eros. Sed imperdiet semper neque, non placerat nisi condimentum sed. Aenean ut orci
+    non nibh consectetur imperdiet. Vivamus sit amet nunc lacus. Fusce eu tortor vel arcu pellentesque semper id vitae
+    sapien. Integer eu feugiat lacus. Morbi id erat ut est aliquet auctor. Ut mi nisi, euismod vitae interdum sed, congue
+    eget ante.
+    
+    Aliquam erat volutpat. Donec non aliquet ligula, non aliquet justo. Curabitur in porttitor augue. Nam scelerisque
+    egestas efficitur. Nulla bibendum nibh in velit cursus, imperdiet tempus nisi faucibus. Nunc at nisi quis risus semper
+    iaculis. Phasellus at pulvinar mi. Cras interdum ultrices justo, vel tincidunt risus congue a. Vestibulum sed ligula a
+    massa scelerisque euismod. Maecenas et eros metus. Mauris et erat sed ex posuere ultricies. Proin id dapibus tellus.
+    Nulla pretium mauris nisl, eu dapibus nulla eleifend sit amet. Duis viverra lorem ut imperdiet vestibulum. Pellentesque
+    a lobortis lacus, in luctus eros.
+    
+    Etiam et libero lectus. Donec quis auctor leo. Integer bibendum ipsum eget egestas tempor. Donec sed blandit justo.
+    Vestibulum egestas sem ut felis viverra, fringilla vestibulum ligula scelerisque. Sed at leo in neque viverra ornare a
+    ac enim. Curabitur in libero feugiat, egestas quam id, finibus diam. Donec consectetur diam congue massa posuere, in
+    laoreet dolor fringilla. Duis eget tortor convallis, auctor velit id, tincidunt mauris. Cras metus urna, sollicitudin
+    et ipsum eu, ultricies tincidunt augue. In accumsan, lorem eu convallis pellentesque, tortor massa fermentum urna, nec
+    elementum tortor nunc at risus. Aenean sodales eget urna hendrerit tempor.
+    
+    Sed semper facilisis turpis, vel auctor nunc efficitur nec. In cursus condimentum felis quis cursus. Nam in imperdiet
+    quam, eu fringilla libero. Mauris euismod mauris leo, nec aliquam nisi convallis vitae. Aliquam odio quam, tempus quis
+    luctus id, rutrum at magna. Praesent vel arcu vel arcu rutrum placerat. Donec ac lacus at lorem fringilla aliquet.
+    Curabitur suscipit interdum ligula eu tempor. Duis sit amet est tellus.</p>
 
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.11.1/riot+compiler.min.js"></script>
     <script src="js/search.js"></script>
     <script>
-        function changeType() {
-            var $input = $('#txtSearch2');
-            $input.val(undefined);
-            var attr = $input.attr('type');
-            if (attr === 'text') $input.attr('type', 'date');
-            else  $input.attr('type', 'text');
-            $input.focus();
-        }
-        function gotfocus() {
-            var $input = $('#txtSearch1');
-            $input.parent().children('div').removeClass('hide');
-        }
-        function lostfocus() {
-            var $input = $('#txtSearch1');
-            $input.parent().children('div').addClass('hide');
-        }
+        let autoFill = new AutoFill(document.getElementById('txtSearch1'));
     </script>
 </body>
 </html>
