@@ -1,11 +1,3 @@
-class AutoFill {
-    constructor(elem) {
-        this._root = elem;
-    }
-
-    get root() { return this._root; };
-};
-
 //#region DOM Management class
 
 class NDOM {
@@ -511,5 +503,41 @@ class FluentDOM {
 
     //#endregion
 }
+
+//#endregion
+
+//#region AutoFill
+
+class AutoFill {
+    constructor(elem) {
+        this._root = elem;
+    }
+
+    get root() { return this._root; };
+};
+
+//#endregion
+
+//#region AutoFillDataSet
+
+class AutoFillDataSet {
+    //#region constructor
+
+    constructor(options) {
+        this._opts = options || { 
+
+        };
+    };
+
+    //#endregion
+
+    //#region public methods
+
+    apply(filter) {
+
+    };
+
+    //#endregion
+};
 
 //#endregion
