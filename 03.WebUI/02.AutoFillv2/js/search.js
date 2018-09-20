@@ -48,6 +48,7 @@ class FluentDOM {
     //#region Style (general) function.
 
     style(name, value) {
+        console.log('style called.');
         if (this._dom && this._dom.element) {
             this._dom.element.style[name] = value;
         }
@@ -221,6 +222,15 @@ class NDOM {
     replaceClass(oldClassName, newClassName) {
         if (!this._elem) return;
         this._elem.classList.replace(oldClassName, newClassName);
+    };
+
+    //#endregion
+
+    //#region Style (general) function.
+
+    style(name, value) {
+        if (!this._elem) return;
+        this.element.style[name] = value;
     };
 
     //#endregion
