@@ -6,196 +6,44 @@ class AutoFill {
     get root() { return this._root; };
 };
 
-//#region DOM Management functions
-
-class FluentDOM {
-    constructor(dom) {
-        this._dom = dom;
-    };
-
-    //#region Class manupulation functions
-
-    addClass(...classNames) {
-        if (this._dom && this._dom.element) {
-            this._dom.element.classList.add(...classNames);
-        }
-        return this;
-    };
-
-    removeClass(...classNames) {
-        if (this._dom && this._dom.element) {
-            this._dom.element.classList.remove(...classNames);
-        }
-        return this;
-    };
-
-    toggleClass(className, force) {
-        if (this._dom) {
-            this._dom.toggleClass(className, force);
-        }
-        return this;
-    };
-
-    replaceClass(oldClassName, newClassName) {
-        if (this._dom) {
-            this._dom.replaceClass(oldClassName, newClassName);
-        }
-        return this;
-    };
-
-    //#endregion
-
-    //#region Style (general) function.
-
-    style(name, value) {
-        console.log('style called.');
-        if (this._dom && this._dom.element) {
-            this._dom.element.style[name] = value;
-        }
-        return this;
-    };
-
-    //#endregion
-
-    //#region margin related functions.
-
-    margin(value) {
-        if (this._dom) {
-            this._dom.margin = value;
-        }
-        return this;
-    };
-
-    marginLeft(value) {
-        if (this._dom) {
-            this._dom.marginLeft = value;
-        }
-        return this;
-    };
-
-    marginTop(value) {
-        if (this._dom) {
-            this._dom.marginTop = value;
-        }
-        return this;
-    };
-
-    marginRight(value) {
-        if (this._dom) {
-            this._dom.marginRight = value;
-        }
-        return this;
-    };
-
-    marginBottom(value) {
-        if (this._dom) {
-            this._dom.marginBottom = value;
-        }
-        return this;
-    };
-
-    //#endregion
-
-    //#region padding related functions.
-
-    padding(value) {
-        if (this._dom) {
-            this._dom.padding = value;
-        }
-        return this;
-    };
-
-    paddingLeft(value) {
-        if (this._dom) {
-            this._dom.paddingLeft = value;
-        }
-        return this;
-    };
-
-    paddingTop(value) {
-        if (this._dom) {
-            this._dom.paddingTop = value;
-        }
-        return this;
-    };
-
-    paddingRight(value) {
-        if (this._dom) {
-            this._dom.paddingRight = value;
-        }
-        return this;
-    };
-
-    paddingBottom(value) {
-        if (this._dom) {
-            this._dom.paddingBottom = value;
-        }
-        return this;
-    };
-
-    //#endregion
-
-    //#region color related functions.
-
-    color(value) {
-        if (this._dom) {
-            this._dom.color = value;
-        }
-        return this;
-    };
-
-    //#endregion
-
-    //#region background related functions.
-
-    background(value) {
-        if (this._dom) {
-            this._dom.background = value;
-        }
-        return this;
-    };
-
-    backgroundColor(value) {
-        if (this._dom) {
-            this._dom.backgroundColor = value;
-        }
-        return this;
-    };
-
-    backgroundImage(value) {
-        if (this._dom) {
-            this._dom.backgroundImage = value;
-        }
-        return this;
-    };
-
-    backgroundPositionX(value) {
-        if (this._dom) {
-            this._dom.backgroundPositionX = value;
-        }
-        return this;
-    };
-
-    backgroundPositionY(value) {
-        if (this._dom) {
-            this._dom.backgroundPositionY = value;
-        }
-        return this;
-    };
-
-    //#endregion
-
-    get element() { return (this._dom) ? this._dom.element : null; }
-}
+//#region DOM Management class
 
 class NDOM {
+    //#region constructor
+
     constructor(elem) {
         this._elem = elem;
     };
 
+    //#endregion 
+
+    //#region fluent method
+
     fluent() {
+        /*
+        console.clear();
+        let props = Object.getPrototypeOf(this);
+        //console.log(props);
+        let propNames = Object.getOwnPropertyNames(props);
+        //console.log(propNames);
+        propNames.forEach((pName) => {
+            let desc = Object.getOwnPropertyDescriptor(NDOM.prototype, pName);
+            
+            if (pName !== 'constructor' && desc && desc.set) {
+                // this should show all set property of NDOM
+                //console.log(pName + ' -> ' + desc);
+            }
+            else if (pName !== 'constructor' && desc && !desc.get && !desc.set) {
+                // this should show all another method.
+                //console.log(pName + ' -> ' + desc);
+            }
+        });
+        */
+
         return new FluentDOM(this);
     };
+
+    //#endregion 
     
     //#region Class manipulation functions.
 
@@ -465,7 +313,203 @@ class NDOM {
 
     //#endregion
 
+    //#region public properties
+
     get element() { return this._elem; }
+
+    //#endregion
+}
+
+//#endregion
+
+//#region DOM Fluent class
+
+class FluentDOM {
+    //#region constructor
+
+    constructor(dom) {
+        this._dom = dom;
+    };
+
+    //#endregion
+
+    //#region Class manupulation functions
+
+    addClass(...classNames) {
+        if (this._dom && this._dom.element) {
+            this._dom.element.classList.add(...classNames);
+        }
+        return this;
+    };
+
+    removeClass(...classNames) {
+        if (this._dom && this._dom.element) {
+            this._dom.element.classList.remove(...classNames);
+        }
+        return this;
+    };
+
+    toggleClass(className, force) {
+        if (this._dom) {
+            this._dom.toggleClass(className, force);
+        }
+        return this;
+    };
+
+    replaceClass(oldClassName, newClassName) {
+        if (this._dom) {
+            this._dom.replaceClass(oldClassName, newClassName);
+        }
+        return this;
+    };
+
+    //#endregion
+
+    //#region Style (general) function.
+
+    style(name, value) {
+        if (this._dom && this._dom.element) {
+            this._dom.element.style[name] = value;
+        }
+        return this;
+    };
+
+    //#endregion
+
+    //#region margin related functions.
+
+    margin(value) {
+        if (this._dom) {
+            this._dom.margin = value;
+        }
+        return this;
+    };
+
+    marginLeft(value) {
+        if (this._dom) {
+            this._dom.marginLeft = value;
+        }
+        return this;
+    };
+
+    marginTop(value) {
+        if (this._dom) {
+            this._dom.marginTop = value;
+        }
+        return this;
+    };
+
+    marginRight(value) {
+        if (this._dom) {
+            this._dom.marginRight = value;
+        }
+        return this;
+    };
+
+    marginBottom(value) {
+        if (this._dom) {
+            this._dom.marginBottom = value;
+        }
+        return this;
+    };
+
+    //#endregion
+
+    //#region padding related functions.
+
+    padding(value) {
+        if (this._dom) {
+            this._dom.padding = value;
+        }
+        return this;
+    };
+
+    paddingLeft(value) {
+        if (this._dom) {
+            this._dom.paddingLeft = value;
+        }
+        return this;
+    };
+
+    paddingTop(value) {
+        if (this._dom) {
+            this._dom.paddingTop = value;
+        }
+        return this;
+    };
+
+    paddingRight(value) {
+        if (this._dom) {
+            this._dom.paddingRight = value;
+        }
+        return this;
+    };
+
+    paddingBottom(value) {
+        if (this._dom) {
+            this._dom.paddingBottom = value;
+        }
+        return this;
+    };
+
+    //#endregion
+
+    //#region color related functions.
+
+    color(value) {
+        if (this._dom) {
+            this._dom.color = value;
+        }
+        return this;
+    };
+
+    //#endregion
+
+    //#region background related functions.
+
+    background(value) {
+        if (this._dom) {
+            this._dom.background = value;
+        }
+        return this;
+    };
+
+    backgroundColor(value) {
+        if (this._dom) {
+            this._dom.backgroundColor = value;
+        }
+        return this;
+    };
+
+    backgroundImage(value) {
+        if (this._dom) {
+            this._dom.backgroundImage = value;
+        }
+        return this;
+    };
+
+    backgroundPositionX(value) {
+        if (this._dom) {
+            this._dom.backgroundPositionX = value;
+        }
+        return this;
+    };
+
+    backgroundPositionY(value) {
+        if (this._dom) {
+            this._dom.backgroundPositionY = value;
+        }
+        return this;
+    };
+
+    //#endregion
+
+    //#region public properties
+
+    get element() { return (this._dom) ? this._dom.element : null; };
+    get dom() { return this._dom; };
+
+    //#endregion
 }
 
 //#endregion
