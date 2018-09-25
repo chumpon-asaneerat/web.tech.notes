@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>NDOM.</title>
+    <link rel="stylesheet" href="css/ndom.css">
+</head>
+<body>
+    <h3>DOM Test.</h3>
+    <div style="margin-top: 10px;">
+        <h3 id="target-h3">Target tag H3</h3>
+        <div id="target-div"></div>
+    </div>
+    <!--
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.11.1/riot+compiler.min.js"></script>
+    -->
+    <script src="js/ndom.js"></script>
+    <script>
+        console.clear();
+        let el1 = document.getElementById('target-h3');
+        let el2 = document.getElementById('target-div');
+        window.dom1 = new NDOM(el1);
+        window.dom2 = new NDOM(el2);
+        // test class function.
+        dom1.class.add('white-fg', 'red-bg')
+        let onclick = (evt) => { 
+            dom1.class.replace('red-bg', 'green-bg');
+            removeEvt();
+        };
+        let removeEvt = () => dom1.event.remove('click', onclick)
+        // attr
+        dom1.attr('data-x', null); // data-x="null"
+        dom1.attr('data-y', ''); // data-y
+        dom1.attr('data-z', undefined); // data-z="undefined"
+        // style
+        dom1.style('margin', '0 auto');
+        dom1.style('padding', '3px');
+        dom1.style('border', '1px solid black');
+        dom1.style('border-radius', '5px');
+        dom1.event.add('click', onclick)
+        
+    </script>
+</body>
+</html>
