@@ -1,15 +1,16 @@
 //#region NDOM and related classes
 
-//#region NDOM
+//#region nlib.dom
 
-class NDOM {
+NDOM = class {
     constructor(elem) {
         this._elem = elem;
-        this._class = new NDOM.DOMClass(this);
-        this._event = new NDOM.DOMEvent(this);
+        this._class = new NDOM.Class(this);
+        this._event = new NDOM.Event(this);
         this._style = new NDOM.Style(this);
         this._attr = new NDOM.Attribute(this);
         this._selector = new NDOM.Selector(this);
+        this._fluent = new NDOM.Fluent(this);
     };
     // class
     get class() { return this._class; }
@@ -55,16 +56,65 @@ class NDOM {
             return this._selector.gets(selector);
         }        
     };
+    // element information.
+    get tagName() {
+        if (!this._elem) return '';
+        return this._elem.tagName;
+    }
+    get text() {
+        if (!this._elem) return '';
+        return this._elem.textContent;
+    }
+    set text(value) {
+        if (!this._elem) return;
+        if (this._elem.textContent != value) {
+            this._elem.textContent = value;
+        }
+    }
+    get html() {
+        if (!this._elem) return '';
+        return this._elem.innerHTML;
+    }
+    set html(value) {
+        if (!this._elem) return;
+        if (this._elem.innerHTML != value) {
+            this._elem.innerHTML = value;
+        }
+    }
+    // parent/child access.
+    get parent() {
+        if (!this._elem) return null;
+        if (!this._elem.parentElement) return null;
+        return new NDOM(this._elem.parentElement);
+    }
+    get children() {
+        let results = [];
+        if (!this._elem) return results;
+        let el = this._elem;
+        let celems = el.children;
+        if (celems && celems.length > 0) {
+            let iMax = celems.length;
+            for (let i = 0; i < iMax; i++) {
+                let celem = celems[i];
+                results.push(new NDOM(celem));
+            }
+        }
+        return results;
+    }
     // fluent
-    fluent() { return new NDOM.Fluent(this); };
+    fluent() { return this._fluent; };
     get elem() { return this._elem; }
+    // static
+    static create(tagName, options) {
+        return new NDOM(document.createElement(tagName, options));
+    };
 };
 
 //#endregion
 
-//#region NDOM.DOMClass
+//#region NDOM.Class
 
-NDOM.DOMClass = class {
+NDOM.Class = class {
     constructor(dom) { this._dom = dom; };
 
     add(...classNames) {
@@ -105,9 +155,9 @@ NDOM.DOMClass = class {
 
 //#endregion
 
-//#region NDOM.DOMEvent
+//#region NDOM.Event
 
-NDOM.DOMEvent = class {
+NDOM.Event = class {
     constructor(dom) { this._dom = dom; };
 
     // event
@@ -174,8 +224,8 @@ NDOM.Attribute = class {
     };
     get dom() { return this._dom; }
     get elem() {
-        if (!this._dom || !this._dom.element) return null;
-        return this._dom.element;
+        if (!this._dom || !this._dom.elem) return null;
+        return this._dom.elem;
     }
 };
 
@@ -184,7 +234,11 @@ NDOM.Attribute = class {
 //#region NDOM.Style
 
 NDOM.Style = class {
-    constructor(dom) { this._dom = dom; };
+    constructor(dom) {
+        this._dom = dom;
+        this._margin = new NDOM.Margin(dom);
+        this._padding = new NDOM.Padding(dom);
+    };
 
     get(name) {
         if (!this._dom || !this._dom.elem) return undefined;
@@ -210,12 +264,142 @@ NDOM.Style = class {
         let el = this._dom.elem;
         return (el.style[name] !== undefined && el.style[name] !== '');
     };
+
+    // margin
+    get margins() { return this._margin; }
+    margin() {
+        if (!this._margin) return undefined;
+        if (!arguments || arguments.length === 0) {
+            return this._margin.val();
+        }
+        else this._margin.val(...arguments);
+    };
+    // padding
+    get paddings() { return this._padding; }
+    padding() {
+        if (!this._padding) return undefined;
+        if (!arguments || arguments.length === 0)
+            return this._padding.val();
+        else this._padding.val(...arguments);
+    };
+
     get dom() { return this._dom; }
     get elem() {
-        if (!this._dom || !this._dom.element) return null;
-        return this._dom.element;
+        if (!this._dom || !this._dom.elem) return null;
+        return this._dom.elem;
     }
 };
+
+//#endregion
+
+//#region NDOM.Style (wrapper)
+
+//#region BlockStyle (common style)
+
+NDOM.BlockStyle = class {
+    constructor(dom) {
+        this._dom = dom;
+        this._prefix = '';
+    };
+
+    get prefix() { return this._prefix; }
+    set prefix(value) { this._prefix = value; }
+
+    val() {
+        if (!this._dom) return undefined;
+        if (!arguments) return this._dom.style(this._prefix);
+        if (arguments.length === 1) {
+            let value = arguments[0];
+            this._dom.style(this._prefix, value);
+        }
+        else if (arguments.length === 2) {
+            let value = 
+                arguments[0] + // top-bottom
+                ' ' +
+                arguments[1];  // right-left
+            this._dom.style(this._prefix, value);
+        }
+        else if (arguments.length === 3) {
+            let value = 
+                arguments[0] + // top
+                ' ' + 
+                arguments[1] + // right-left
+                ' ' +
+                arguments[2];  // bottom
+            console.log(value)
+            this._dom.style(this._prefix, value);
+        }
+        else if (arguments.length === 4) {
+            let value = 
+                arguments[0] + // top
+                ' ' + 
+                arguments[1] + // right-left
+                ' ' +
+                arguments[2] + // bottom
+                ' ' + 
+                arguments[3];  // left
+            console.log(value)
+            this._dom.style(this._prefix, value);
+        }
+        else {
+            return this._dom.style(this._prefix);
+        }
+    };
+    left(value) {
+        if (!this._dom) return undefined;
+        if (arguments && arguments.length === 1)
+            this._dom.style(this._prefix + '-left', value);
+        else return this._dom.style(this._prefix + '-left');
+    };
+    right(value) {
+        if (!this._dom) return undefined;
+        if (arguments && arguments.length === 1)
+            this._dom.style(this._prefix + '-right', value);
+        else return this._dom.style(this._prefix + '-right');
+    };
+    top(value) {
+        if (!this._dom) return undefined;
+        if (arguments && arguments.length === 1)
+            this._dom.style(this._prefix + '-top', value);
+        else return this._dom.style(this._prefix + '-top');
+    };
+    bottom(value) {
+        if (!this._dom) return undefined;
+        if (arguments && arguments.length === 1)
+            this._dom.style(this._prefix + '-bottom', value);
+        else return this._dom.style(this._prefix + '-bottom');
+    };
+
+    get dom() { return this._dom; }
+    get elem() {
+        if (!this._dom || !this._dom.elem) return null;
+        return this._dom.elem;
+    }
+};
+
+//#endregion
+
+//#region Margin
+
+NDOM.Margin = class extends NDOM.BlockStyle {
+    constructor(dom) {
+        super(dom);
+        this.prefix = 'margin';
+    };
+};
+
+//#endregion
+
+//#region Padding
+
+NDOM.Padding = class extends NDOM.BlockStyle {
+    constructor(dom) {
+        super(dom);
+        this.prefix = 'padding';
+    };
+};
+
+//#endregion
 
 //#endregion
 
@@ -251,8 +435,8 @@ NDOM.Selector = class {
 
     get dom() { return this._dom; }
     get elem() {
-        if (!this._dom || !this._dom.element) return null;
-        return this._dom.element;
+        if (!this._dom || !this._dom.elem) return null;
+        return this._dom.elem;
     }
 };
 
@@ -265,8 +449,8 @@ NDOM.Fluent = class {
 
     get dom() { return this._dom; }
     get elem() {
-        if (!this._dom || !this._dom.element) return null;
-        return this._dom.element;
+        if (!this._dom || !this._dom.elem) return null;
+        return this._dom.elem;
     }
 };
 
