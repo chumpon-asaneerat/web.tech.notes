@@ -9,3 +9,20 @@
 .green-bg {
     background-color: green;
 }
+
+.class1 {
+    display: block;
+}
+
+.class2 {
+    display: block;
+}
+
+.class3 {
+    display: block;
+}
+
+.highlight {
+    background-color: silver;
+    border: 1px dotted black;
+}

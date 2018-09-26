@@ -13,6 +13,13 @@
         <h3 id="target-h3">Target tag H3</h3>
         <div id="target-div"></div>
     </div>
+    <div id="target-p">
+        <p>    This element has extra spacing     and contains <span>a span element</span>.</p>
+        <p class="class1 class2">This line has classes `class1 class2`</p>
+        <p class="class1">This line has classes `class1`</p>
+        <p class="class2">This line has classes `class2`</p>
+        <p class="class3">This line has classes `class3`</p>
+    </div>
     <!--
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.11.1/riot+compiler.min.js"></script>
@@ -22,8 +29,10 @@
         console.clear();
         let el1 = document.getElementById('target-h3');
         let el2 = document.getElementById('target-div');
+        let el3 = document.getElementById('target-p');
         window.dom1 = new NDOM(el1);
         window.dom2 = new NDOM(el2);
+        window.dom3 = new NDOM(el3);
         // test class function.
         dom1.class.add('white-fg', 'red-bg')
         let onclick = (evt) => { 
@@ -35,13 +44,23 @@
         dom1.attr('data-x', null); // data-x="null"
         dom1.attr('data-y', ''); // data-y
         dom1.attr('data-z', undefined); // data-z="undefined"
-        // style
+        // style - set
         dom1.style('margin', '0 auto');
         dom1.style('padding', '3px');
         dom1.style('border', '1px solid black');
         dom1.style('border-radius', '5px');
-        dom1.event.add('click', onclick)
-        
+        dom1.event.add('click', onclick);
+        // style - get
+        let sty_margin = dom1.style('border-radius');
+        console.log(sty_margin);
+        // styles - access DOMStyle class.
+        let styles = dom1.style();
+        // or
+        styles = dom1.styles;
+        console.log('has inline style `margin`:', styles.has('margin'));
+        // query selector
+        let nodes = dom3.query('.class1');
+        nodes.forEach(dom => { dom.class.add('highlight') });
     </script>
 </body>
 </html>

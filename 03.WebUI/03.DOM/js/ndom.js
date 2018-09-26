@@ -9,6 +9,7 @@ class NDOM {
         this._event = new NDOM.DOMEvent(this);
         this._style = new NDOM.Style(this);
         this._attr = new NDOM.Attribute(this);
+        this._selector = new NDOM.Selector(this);
     };
     // class
     get class() { return this._class; }
@@ -43,6 +44,16 @@ class NDOM {
         else if (arguments.length === 2) {
             this._style.set(name, value);
         }
+    };
+    // query selector
+    query(selector) { 
+        if (!this._elem || !arguments) return null;
+        if (arguments.length === 0) {
+            return this._selector;
+        }
+        else {
+            return this._selector.gets(selector);
+        }        
     };
     // fluent
     fluent() { return new NDOM.Fluent(this); };
@@ -199,6 +210,45 @@ NDOM.Style = class {
         let el = this._dom.elem;
         return (el.style[name] !== undefined && el.style[name] !== '');
     };
+    get dom() { return this._dom; }
+    get elem() {
+        if (!this._dom || !this._dom.element) return null;
+        return this._dom.element;
+    }
+};
+
+//#endregion
+
+//#region NDOM.Selector
+
+NDOM.Selector = class {
+    constructor(dom) { this._dom = dom; };
+    // returns the first child element that matches a specified CSS selector(s).
+    // of an element. If not found null returns.
+    get(selector) {
+        if (!this._dom || !this._dom.elem) return null;
+        if (!selector || selector.trim() === '') return null;
+        let el = this._dom.elem;
+        let element = el.querySelector(selector);
+        return (element) ? element : null;
+    };
+    // returns a collection of an element's child elements that match a specified 
+    // CSS selector(s), as a static NodeList object. If not found empty array returns.
+    gets(selector) {
+        let results = [];
+        if (!this._dom || !this._dom.elem) return results;
+        if (!selector || selector.trim() === '') return results;
+        let el = this._dom.elem;
+        let elements = el.querySelectorAll(selector);
+        if (elements && elements.length > 0) {
+            elements.forEach(element => {
+                let edom = new NDOM(element);
+                results.push(edom);
+            })
+        }
+        return results;
+    };
+
     get dom() { return this._dom; }
     get elem() {
         if (!this._dom || !this._dom.element) return null;
