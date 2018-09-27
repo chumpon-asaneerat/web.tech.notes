@@ -1,6 +1,6 @@
 //#region NDOM and related classes
 
-//#region nlib.dom
+//#region NDOM
 
 NDOM = class {
     constructor(elem) {
@@ -102,7 +102,7 @@ NDOM = class {
         return results;
     }
     // child node management.
-    appendChild(dom) {
+    addChild(dom) {
         if (!this._elem || !dom || !dom.elem) return;
         this._elem.appendChild(dom.elem);
     };
@@ -115,6 +115,28 @@ NDOM = class {
         while (this._elem.firstChild) {
             this._elem.removeChild(this._elem.firstChild);
         }
+    };
+    // offset
+    get offsetLeft() {
+        if (!this._elem) return undefined
+        return this._elem.offsetLeft;
+    }
+    get offsetTop() { 
+        if (!this._elem) return undefined
+        return this._elem.offsetTop;
+    }
+    get offsetWidth() {
+        if (!this._elem) return undefined
+        return this._elem.offsetWidth;
+    }
+    get offsetHeight() {
+        if (!this._elem) return undefined
+        return this._elem.offsetHeight;
+    }
+    // behavior
+    focus() { 
+        if (!this._elem) return;
+        this._elem.focus();
     };
     // fluent
     fluent() { return this._fluent; };
