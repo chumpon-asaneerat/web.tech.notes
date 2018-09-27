@@ -101,6 +101,21 @@ NDOM = class {
         }
         return results;
     }
+    // child node management.
+    appendChild(dom) {
+        if (!this._elem || !dom || !dom.elem) return;
+        this._elem.appendChild(dom.elem);
+    };
+    removeChild(value) {
+        if (!this._elem || !dom || !dom.elem) return;
+        this._elem.removeChild(dom.elem);
+    };
+    clearChildren() {
+        if (!this._elem) return;
+        while (this._elem.firstChild) {
+            this._elem.removeChild(this._elem.firstChild);
+        }
+    };
     // fluent
     fluent() { return this._fluent; };
     get elem() { return this._elem; }
@@ -305,9 +320,11 @@ NDOM.BlockStyle = class {
     get prefix() { return this._prefix; }
     set prefix(value) { this._prefix = value; }
 
-    val() {
-        if (!this._dom) return undefined;
-        if (!arguments) return this._dom.style(this._prefix);
+    get hasStyle() { return (this._dom && this._dom.elem); }
+
+    val() {        
+        if (!this.hasStyle) return undefined; 
+        if (!arguments) return this.style(this._prefix);
         if (arguments.length === 1) {
             let value = arguments[0];
             this._dom.style(this._prefix, value);
@@ -326,7 +343,6 @@ NDOM.BlockStyle = class {
                 arguments[1] + // right-left
                 ' ' +
                 arguments[2];  // bottom
-            console.log(value)
             this._dom.style(this._prefix, value);
         }
         else if (arguments.length === 4) {
@@ -338,43 +354,50 @@ NDOM.BlockStyle = class {
                 arguments[2] + // bottom
                 ' ' + 
                 arguments[3];  // left
-            console.log(value)
             this._dom.style(this._prefix, value);
         }
         else {
             return this._dom.style(this._prefix);
         }
-    };
-    left(value) {
-        if (!this._dom) return undefined;
-        if (arguments && arguments.length === 1)
-            this._dom.style(this._prefix + '-left', value);
-        else return this._dom.style(this._prefix + '-left');
-    };
-    right(value) {
-        if (!this._dom) return undefined;
-        if (arguments && arguments.length === 1)
-            this._dom.style(this._prefix + '-right', value);
-        else return this._dom.style(this._prefix + '-right');
-    };
-    top(value) {
-        if (!this._dom) return undefined;
-        if (arguments && arguments.length === 1)
-            this._dom.style(this._prefix + '-top', value);
-        else return this._dom.style(this._prefix + '-top');
-    };
-    bottom(value) {
-        if (!this._dom) return undefined;
-        if (arguments && arguments.length === 1)
-            this._dom.style(this._prefix + '-bottom', value);
-        else return this._dom.style(this._prefix + '-bottom');
-    };
+    }
+    get left() {
+        if (!this.hasStyle) return undefined;
+        return this._dom.style(this._prefix + '-left');
+    }
+    set left(value) {
+        if (!this.hasStyle) return;
+        this._dom.style(this._prefix + '-left', value);
+    }
+    get right() {
+        if (!this.hasStyle) return undefined;
+        return this._dom.style(this._prefix + '-right');
+    }
+    set right(value) {
+        if (!this.hasStyle) return;
+        this._dom.style(this._prefix + '-right', value);
+    }
+    get top() {
+        if (!this.hasStyle) return undefined;
+        return this._dom.style(this._prefix + '-top');
+    }
+    set top(value) {
+        if (!this.hasStyle) return;
+        this._dom.style(this._prefix + '-top', value);
+    }
+    get bottom() {
+        if (!this.hasStyle) return undefined;
+        return this._dom.style(this._prefix + '-bottom');
+    }
+    set bottom(value) {
+        if (!this.hasStyle) return;
+        this._dom.style(this._prefix + '-bottom', value);
+    }
 
     get dom() { return this._dom; }
     get elem() {
         if (!this._dom || !this._dom.elem) return null;
         return this._dom.elem;
-    }
+    }    
 };
 
 //#endregion
