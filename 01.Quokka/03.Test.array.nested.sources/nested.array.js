@@ -236,6 +236,19 @@ let qsets = [
     { qsetid: 'QS0003', qsetdescription: 'Quality QSet' }
 ];
 
+
+let questions = [
+    { qsetid: 'QS0001', qseq: "1", qsetdescription: 'How fast you problem solved?.' },
+    { qsetid: 'QS0001', qseq: "2", qsetdescription: 'What do you think about our performance?.' },
+    { qsetid: 'QS0002', qseq: "1", qsetdescription: 'What do you think aout our service?.' },
+    { qsetid: 'QS0002', qseq: "2", qsetdescription: 'What do you think aout our staff?.' },
+    { qsetid: 'QS0003', qseq: "1", qsetdescription: 'What do you think aout our food quality?.' },
+    { qsetid: 'QS0003', qseq: "2", qsetdescription: 'What do you think aout our food teste?.' }
+];
+
+
+/*
+// First attemp
 let cmdDS = new NArrray.NestedDataSource()
 cmdDS.itemsource(commands);
 let qsetDS = new NArrray.NestedDataSource()
@@ -259,13 +272,18 @@ class StateManager {
         let self = this;
         this._root = new State(this);
         this._current = this._root;
+        this._obj = { };
     };
 
     select(item, getitems) {
-        if (!item) return;
+        if (!item) {
+            // not assigned goto root state.
+            this._current = this._root;
+            return;
+        }
         let state = new State(this);
-        state.parent = this._current;
-        state.item = item;
+        state.parentState = this._current;
+        state.parentItem = item;
         state.getitems = getitems;
 
         this._current = state;
@@ -273,6 +291,7 @@ class StateManager {
 
     get root() { return this._root; }
     get current() { return this._current; }
+    get obj() { return this._obj; }
     get items() {
         if (this._current) {
             return this._current.items;
@@ -285,8 +304,8 @@ class State {
     constructor(sm) {
         this._sm = sm;
         this._items = null;
-        this._parent = null;
-        this._item = null;
+        this._parentState = null;
+        this._parentItem = null;
         //this._children = null;
         this._getitemsCB = null;
     };
@@ -298,22 +317,22 @@ class State {
     }
 
     get manager() { return this._sm; }
-    get parent() { return this._parent; }
-    set parent(value) {
-        if (this._parent != value) {
-            this._parent = value;
+    get parent() { return this._parentState; }
+    set parentState(value) {
+        if (this._parentState != value) {
+            this._parentState = value;
         }
     }
-    get item() { return this._item; }
-    set item(value) {
-        if (this._item != value) {
-            this._item = value;
+    get parentItem() { return this._parentItem; }
+    set parentItem(value) {
+        if (this._parentItem != value) {
+            this._parentItem = value;
         }
     }
     get items() {
         if (!this._items) {
             if (this._getitemsCB) {
-                this._items = this._getitemsCB(this._item);
+                this._items = this._getitemsCB(this._parentItem);
             }
         }
         return this._items;
@@ -322,32 +341,125 @@ class State {
 
 let sm = new StateManager();
 sm.root.getitems = () => { return commands; };
-//console.log(sm.items);
-let item = sm.items[1];
-sm.select(item, (x) => { 
-    let items = null;
-    switch (x.id) {
-        case 'cmd1':
-            items = qsets;
-            break;
-        case 'cmd2':
-            items = qsets;
-            break;
-        case 'cmd3':
-            items = qsets;
-            break;
-        case 'cmd4':
-            items = qsets;
-            break;
-        case 'cmd5':
-            items = qsets;
-            break;
-        case 'cmd6':
-            items = qsets;
-            break;
-    }
-    return items;
-});
 //console.log(sm.current);
 //console.log(sm.current.item)
+let item;
+
+// select command 1 - QSets
+let cmdSelector = (x) => {
+    let items = null;
+    if (Object.keys(x).indexOf('id') !== -1) {
+        // command lists
+        if (!sm.obj.qset) {
+            // no qset selected.
+            console.log('No qset select so qsets returns.');
+            items = qsets;
+        }
+        else {
+            // qset is selected.
+            console.log('qset is select so returns related array.');
+            if (x.id === 'cmd1') items = qsets;
+            else if (x.id === 'cmd2') items = questions;
+            else { 
+
+            }
+        }        
+    }
+    return items;
+}
+item = sm.items[1]; 
+sm.select(item, cmdSelector);
 console.log(sm.items);
+
+// select QSet - index 2 -> QS0003 after that the command list returns.
+let qsetSelector = (x) => {
+    let items = null;
+    if (Object.keys(x).indexOf('qsetid') !== -1) {
+        sm.obj.qset = item;
+    }
+    return items;
+}
+item = sm.items[2];
+console.log(item)
+sm.select(item, qsetSelector);
+console.log(sm.items);
+
+sm.select(); // back to root state.
+console.log(sm.items);
+item = sm.items[2];
+sm.select(item);
+console.log(sm.items);
+
+// select command 2 - Questions
+let quesSelector = (x) => {
+    let items = null;
+    if (Object.keys(x).indexOf('qsseq') === -1) {
+    }
+    return items;
+}
+item = sm.items[1];
+console.log(item)
+sm.select(item, quesSelector);
+console.log(sm.items);
+
+*/
+
+class StateManager {
+    constructor() {
+        this._state = {};
+        this._data = {};
+    };
+    // public methods
+    clearState() { this._state = {}; };
+    clearData() { this._data = {}; };
+    // public properties
+    get data() { return this._data; }
+    get state() { return this._state; }
+
+    getstate(name) {
+        let result = null;
+        let sName = name.trim().toLowerCase();
+        let states = Object.keys(this._state);
+        let idx = states.indexOf(sName);
+        if (idx === -1) {
+            console.error('state not found.');
+        }
+        else {
+            result = this._state[sName];
+        }
+        return result;
+    };
+};
+
+class NState {
+    constructor(manager, name) {
+        this._sm = manager;
+        this._name = name;
+        this._items = null;
+        if (this._sm) {
+            let states = Object.keys(this._sm.state);
+            let sName = this._name.trim().toLowerCase();
+            let idx = states.indexOf(sName);
+            if (idx === -1) {
+                // state not exists. so attach current state.
+                this._sm.state[sName] = this;
+            }
+            else {
+                console.error('State already exists.');
+            }
+        }
+    };
+    // public properties
+    get manager() { return this._sm; }
+    get name() { return this._name; }
+    get items() { return this._items; }
+    set items(value) { this._items = value; }
+};
+
+let sm = new StateManager();
+let commmandState = new NState(sm, 'commands');
+commmandState.items = commands;
+let qsetState = new NState(sm, 'qsets');
+qsetState.items = qsets;
+let questionState = new NState(sm, 'questions');
+questionState.items = questions;
