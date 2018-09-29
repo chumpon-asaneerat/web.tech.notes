@@ -1,12 +1,12 @@
-//#region NArrray
+//#region NArray
 
-class NArrray { };
+class NArray { };
 
 //#endregion
 
-//#region NArrray.CaseSensitiveDataSource
+//#region NArray.CaseSensitiveDataSource
 
-NArrray.CaseSensitiveDataSource = class {
+NArray.CaseSensitiveDataSource = class {
     constructor() {
         this._ds = null; 
         this._valueMember = '';
@@ -24,10 +24,12 @@ NArrray.CaseSensitiveDataSource = class {
             this.refresh(); // make sure value is null if source is null.
             return null; // datasource is null.
         }
-        if (this._values && this._values.length !== this._items.length) {
+        if (this._values && this._items) {
             // already create values map but seem size is difference
             // so reset the values map.
-            this.refresh();
+            if (this._values.length !== this._items.length) {
+                this.refresh();
+            }
         }
         // values map is not created so created only if required.
         if (!this._values) {
@@ -84,11 +86,11 @@ NArrray.CaseSensitiveDataSource = class {
 
 //#endregion
 
-//#region NArrray.AutoFilterDataSource
+//#region NArray.AutoFilterDataSource
 
-NArrray.AutoFilterDataSource = class {
+NArray.AutoFilterDataSource = class {
     constructor() {
-        this._ds = new NArrray.CaseSensitiveDataSource();
+        this._ds = new NArray.CaseSensitiveDataSource();
         this._input = '';
         this._items = null;
         this._parts = null;
@@ -162,6 +164,16 @@ NArrray.AutoFilterDataSource = class {
     }
     get parts() { return this._parts; }
 
+    indexOf(search) {
+        if (!this._ds) return null -1;
+        return this._ds.indexOf(search);
+    };
+    getitem(index) {
+        if (!this._ds) return null;
+        let item = this._ds.getitem(index);
+        return item;
+    };
+
     get datasource() { return this._ds.datasource; }
     set datasource(value) {
         if (value && !(value instanceof Array)) {
@@ -199,9 +211,59 @@ NArrray.AutoFilterDataSource = class {
 
 //#endregion
 
-//#region NArrray.NestedDataSource
+//#region Test NArray.AutoFilterDataSource
+/*
+let items = [
+    { id: 'A1', name: 'Apple' },
+    { id: 'A2', name: 'Applicot' },
+    { id: 'A3', name: 'Action' },
+    { id: 'A4', name: 'Bison' },
+    { id: 'A5', name: 'Elephen' },
+    { id: 'A6', name: 'Eleven' },
+    { id: 'A7', name: 'Boston' },
+    { id: 'A8', name: 'CPP' },
+    { id: 'A9', name: 'Capture' },
+    { id: 'A10', name: 'Tiger' },
+]
 
-NArrray.NestedDataSource = class {
+let items2 = [
+    'Apple',
+    'Applicot',
+    'Action',
+    'Bison',
+    'Elephen',
+    'Eleven',
+    'Boston',
+    'CPP',
+    'Capture',
+    'Tiger',
+]
+
+let arr = new NArray.AutoFilterDataSource()
+let iCase = 1
+switch (iCase) {
+    case 1: //- object array
+        arr.datasource = items
+        arr.valueMember = 'name'
+        arr.caseSensitive = false
+        arr.filter = 'ti'
+        break;
+    case 2: //- simple array
+        arr.datasource = items2;
+        arr.valueMember = '';
+        arr.caseSensitive = false
+        arr.filter = 'ti'
+        break;
+}
+
+console.log(arr.items)
+console.log(arr.parts)
+*/
+//#endregion
+
+//#region NArray.NestedDataSource - not implements
+/*
+NArray.NestedDataSource = class {
     constructor() {
         this._parent = null;
         this._items = null;
@@ -214,12 +276,153 @@ NArrray.NestedDataSource = class {
     get parent() { return this._parent; }
     get items() { return this._items; }
 };
+*/
+//#endregion
+
+//#region NArray.StateManger
+
+NArray.NStateManager = class {
+    constructor() {
+        this._states = [];
+        this._data = {};
+        this._nav = null;
+    };
+    // public methods
+    get states() { return this._states; }
+    state(name, opts) {
+        let result = undefined;
+        if (!this._states) this._states = {}; // create if null or undefined.
+        if (!arguments) return result
+        if (arguments.length === 0) return result;
+        if (arguments.length >= 1) {
+            let sName = (name) ? name.trim().toLowerCase() : result;
+            if (!sName) {
+                console.error('name parameter not assigned.');
+                return result;
+            }
+            let maps = this._states.map(state => state.name );
+            let idx = maps.indexOf(sName);
+            if (arguments.length === 1) {
+                // get state by name.
+                if (idx === -1) return result;
+                result = this._states[idx];
+            }
+            else {
+                // set state by name with spefificed value.
+                let nObj = new NArray.NState(this, sName, opts);
+                nObj.refresh(); // refresh when new state assigned.
+                if (idx === -1) 
+                    this._states.push(nObj);
+                else this._states[idx] = nObj;
+                // set result
+                result = nObj;
+            }
+        }
+        return result;
+    };
+    clear() {
+        this._states.splice(0); // remove all.
+    };
+    clearData() {
+        this._data = {};
+    };
+    refresh(bClearData) {
+        this._states.forEach(state => state.refresh() );
+        if (bClearData) this.clearData();
+    };
+    // public properties
+    get data() { return this._data; }
+    set data(value) {
+        if (this._data != value) {
+            this._data = value;
+            if (!this._data) this._data = {};
+        }
+    }
+    get nav() { return this._nav; }
+    set nav(value) { 
+        // required to check assigned value exists in state list.
+        this._nav = value;
+    }
+};
 
 //#endregion
 
-//#region NArrray.
+//#region NArray.NState
+
+NArray.NState = class {
+    constructor(stateManager, name, opts) {
+        if (!name || name.trim().length === 0) {
+            throw new Error('Name parameter is not assigned.');
+        }
+        this._sm = stateManager;
+        this._name = name.trim().toLowerCase();
+        this._opts = opts;
+        this._ds = new NArray.AutoFilterDataSource();
+        this._ds.caseSensitive = false;
+    };
+    // public methods.
+    refresh() {
+        if (!this._ds) {
+            console.error('Internal datasource is null.');
+            return;
+        }
+        this._ds.datasource = null;
+        if (this.binding) {
+            if (this.binding.valueMember) {
+                // set binding properties.
+                let sMember = String(this.binding.valueMember)
+                this._ds.valueMember = sMember;
+            }
+            else {
+                //console.log('displayMember not assigned.');
+            }
+        }
+        if (this.functions && this.functions.getDataSource) {
+            this._ds.datasource = this.functions.getDataSource();
+        }
+    };
+    getitem(value) {
+        let result = null;
+        if (!this.items) return result;
+        if (!this._ds) return result;
+        let idx = this._ds.indexOf(value);
+        if (idx !== -1) result = this._ds.getitem(idx);
+        return result;
+    };
+    selectItem(value) {
+        let result = undefined;
+        if (!this._sm) return result;
+        let item = this.getitem(value);
+        if (!item) return result;
+        if (this.functions && this.functions.selectItem) {
+            result = this.functions.selectItem(this._sm, this, item);
+        }
+        return result;
+    };
+    // public properties.
+    get manager() { return this._sm; }
+    get name() { return this._name; }
+
+    get binding() { 
+        return (this._opts && this._opts.binding) ? this._opts.binding : null;
+    }
+    get functions() {
+        return (this._opts && this._opts.functions) ? this._opts.functions : null;
+    }
+    get datasource() { return this._ds.datasource; }
+    get valueMember() { return this._ds.valueMember; }
+    get filter() { return this._ds.filter; }
+    set filter(value) { this._ds.filter = value; }
+    get items() { return this._ds.items }
+};
+// overrides methods.
+NArray.NState.prototype.toString = function() {
+    return `${this.name}`;
+};
 
 //#endregion
+
+//#region Test NArray.NStateManger
 
 let commands = [
     { id: 'cmd1', text: '1. QSets' },
@@ -236,22 +439,136 @@ let qsets = [
     { qsetid: 'QS0003', qsetdescription: 'Quality QSet' }
 ];
 
-
 let questions = [
-    { qsetid: 'QS0001', qseq: "1", qsetdescription: 'How fast you problem solved?.' },
-    { qsetid: 'QS0001', qseq: "2", qsetdescription: 'What do you think about our performance?.' },
-    { qsetid: 'QS0002', qseq: "1", qsetdescription: 'What do you think aout our service?.' },
-    { qsetid: 'QS0002', qseq: "2", qsetdescription: 'What do you think aout our staff?.' },
-    { qsetid: 'QS0003', qseq: "1", qsetdescription: 'What do you think aout our food quality?.' },
-    { qsetid: 'QS0003', qseq: "2", qsetdescription: 'What do you think aout our food teste?.' }
+    { qsetid: 'QS0001', qseq: "1", quesText: 'How fast you problem solved?.' },
+    { qsetid: 'QS0001', qseq: "2", quesText: 'What do you think about our performance?.' },
+    { qsetid: 'QS0002', qseq: "1", quesText: 'What do you think aout our service?.' },
+    { qsetid: 'QS0002', qseq: "2", quesText: 'What do you think aout our staff?.' },
+    { qsetid: 'QS0003', qseq: "1", quesText: 'What do you think aout our food quality?.' },
+    { qsetid: 'QS0003', qseq: "2", quesText: 'What do you think aout our food teste?.' }
 ];
 
+let stateData = {
+    // current command
+    current: '', 
+    // select qset item
+    qsets: null, 
+    // selected questions
+    quets: [],
+    // selected date
+    date: {
+        begin: null, end: null
+    },
+    branchs: [],
+    orgs: [],
+    members: []
+}
+//let state = new NArray.NState(sm) // invalid
+//let state = new NArray.NState(sm, null) // invalid
+//let state = new NArray.NState(sm, '') // invalid
+//let state = new NArray.NState(sm, 'x') // valid.
+let nav = {
+    state: {
+        current: null,
+        commands : null,
+        qsets: null,
+        questions: null,
+        date: null,
+        branchs: null,
+        orgs: null,
+        members: null
+    },
+    getCurrent: (manager) => {
+        if (!manager) return null;
+        let smData = manager.data;
+        let result = null;
+        if (!smData.qsets) {
+            result = manager.nav.state.qsets;
+        }
+        else {
+            if (smData.current === '' || smData.current === 'commands') {
+                result = manager.nav.state.commands;
+            }
+            else if (smData.current === 'qsets') {
+                result = manager.nav.state.qsets;
+            }
+        }
+        manager.data.current = (result) ? result.name : '';
+        return result;
+    }
+}
 
+let sm = new NArray.NStateManager()
+sm.data = stateData;
+sm.nav = nav;
+
+nav.state.commands = sm.state('commands', {
+    binding: { valueMember: 'text' },
+    functions: { 
+        getDataSource(manager) {
+            return commands;
+        },
+        selectItem(manager, state, item) {
+            // check item
+            if (!item) return state;
+        }
+    }
+})
+nav.state.qsets = sm.state('qsets', {
+    binding: { valueMember: 'qsetdescription' },
+    functions: {
+        getDataSource(manager) {
+            return qsets;
+        },
+        selectItem(manager, state, item) {
+            // check item
+            if (!item) return state;
+            // qset item selected so assigned to state manager data.
+            manager.data.qsets = item;
+        }
+    }
+})
+nav.state.questions = sm.state('questions', {
+    binding: { valueMember: 'quesText' },
+    functions: {
+        getDataSource(manager) {
+            return questions;
+        },
+        selectItem(manager, state, item) {
+
+        }
+    }
+})
+
+//console.log(sm.states)
+//sm.clear();
+//console.log(sm.states)
+
+//console.log(cmdSTATE.datasource)
+//console.log(cmdSTATE.items)
+//cmdSTATE.filter = 'qu'
+//console.log(cmdSTATE.items)
+
+console.log(nav.state.commands.toString())
+
+// STEP 1. Nothing.
+sm.nav.state.current = nav.getCurrent(sm)
+//console.log(nav.state.qsets.items);
+//console.log(sm.nav.state.current.items);
+
+//console.log(sm.nav.state.current.name)
+sm.nav.state.current.selectItem('Performance QSet')
+//console.log(sm.data)
+sm.nav.state.current = sm.nav.state.commands
+console.log(sm.nav.state.current.items);
+
+//#endregion
+
+//#region First attemp
 /*
-// First attemp
-let cmdDS = new NArrray.NestedDataSource()
+let cmdDS = new NArray.NestedDataSource()
 cmdDS.itemsource(commands);
-let qsetDS = new NArrray.NestedDataSource()
+let qsetDS = new NArray.NestedDataSource()
 qsetDS.itemsource(qsets, cmdDS);
 
 let state = [
@@ -403,7 +720,10 @@ sm.select(item, quesSelector);
 console.log(sm.items);
 
 */
+//#endregion
 
+//#region Second attemp
+/*
 class StateManager {
     constructor() {
         this._state = {};
@@ -463,3 +783,5 @@ let qsetState = new NState(sm, 'qsets');
 qsetState.items = qsets;
 let questionState = new NState(sm, 'questions');
 questionState.items = questions;
+*/
+//#endregion
