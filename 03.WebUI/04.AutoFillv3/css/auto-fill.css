@@ -1,0 +1,92 @@
+/* AUTO FILL */
+.auto-fill {
+    display: block;
+    margin: 0 auto;
+    padding: 2px 5px;
+    border: 1px solid silver;
+    cursor: text;
+    white-space: nowrap;
+}
+
+.auto-fill.focused { border: 1px solid cornflowerblue; }
+
+.auto-fill span.input-text {
+    display: inline-block;
+    outline: none;
+    white-space: pre;
+    min-width: 1px;
+}
+
+.auto-fill span.suggest-text {
+    display: inline-block;
+    color: silver;
+    outline: none;
+    white-space: pre;
+}
+
+.auto-fill .drop-panel {
+    display: block;
+    position: absolute;
+    margin: 0 auto;
+    padding: 2px;
+    background: white;
+    border: 1px solid silver;
+    max-height: 10rem;
+    border-radius: 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    cursor: pointer;
+}
+
+.auto-fill .drop-panel.hide { display: none; }
+
+.auto-fill .drop-panel .auto-fill-item {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+    padding: 1px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    color: silver;
+}
+
+.auto-fill .drop-panel .auto-fill-item:hover {
+    color: whitesmoke;
+    background: cornflowerblue;
+    border: 1px solid royalblue;
+    border-radius: 2px;
+    opacity: 0.94;
+}
+
+.auto-fill .drop-panel .auto-fill-item.hide { display: none; }
+
+.auto-fill .drop-panel .auto-fill-item span {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0;
+    white-space: pre;
+    cursor: pointer;
+}
+
+.auto-fill .drop-panel .auto-fill-item b {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0;
+    color: dimgray;
+    white-space: pre;
+    cursor: pointer;
+}
+
+.auto-fill .drop-panel .auto-fill-item:hover b {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0;
+    color: white;
+    white-space: pre;
+    cursor: pointer;
+}
+
+.auto-fill .drop-panel .auto-fill-item.selected { background: cornflowerblue; }
+.auto-fill .drop-panel .auto-fill-item.selected span { color: silver; }
+.auto-fill .drop-panel .auto-fill-item.selected span b { color: whitesmoke; }

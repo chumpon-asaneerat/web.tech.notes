@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Search suggestions.</title>
+    <link rel="stylesheet" href="css/auto-fill.css">
+</head>
+<body>
+    <h3>Search suggestions.</h3>
+    <!-- Concept -->
+    <div style="margin-top: 10px;">
+        <input type="text">        
+        <div id="txtSearch1">
+        </div>
+        <h4 id="outResult">Result:</h4>
+    </div>
+    <hr/>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin fermentum ligula vel hendrerit porta. Aenean lectus mi,
+    mollis a lorem quis, dignissim facilisis erat. Donec quis tempus quam, in fermentum elit. Nullam auctor libero et
+    fringilla tempor. Etiam ultrices quam rhoncus ante mollis tempus. Nullam luctus elementum lorem, vitae euismod metus
+    sodales eget. Aliquam feugiat metus eu urna sollicitudin vestibulum. Nulla tempor ligula et dolor venenatis pulvinar.
+    Pellentesque aliquam mattis enim. Nulla facilisi. Integer neque magna, fringilla a lobortis a, finibus vel ex. Praesent
+    porta finibus arcu a facilisis. Nam ipsum ex, lacinia vel libero ac, eleifend suscipit quam. Quisque sit amet efficitur
+    tortor.</p>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.11.1/riot+compiler.min.js"></script>
+    <script src="js/nlib.js"></script>
+    <script>
+        let elem = document.getElementById('outResult');
+        let autofill = new NGui.AutoFill(elem);
+    </script>
+</body>
+</html>
