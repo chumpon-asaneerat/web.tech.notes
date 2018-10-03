@@ -5,15 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Search suggestions.</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css">
     <link rel="stylesheet" href="css/auto-fill.css">
 </head>
 <body>
     <h3>Search suggestions.</h3>
     <!-- Concept -->
-    <div style="margin-top: 10px;">
-        <input type="text">        
+    <div style="display: block; margin:0 auto; margin-top: 10px; width: 80%;">
         <div id="txtSearch1">
+            <!--
+            <div class="auto-fill-container">
+                <span contenteditable="true" class="input-text">Input<span class="suggest-text"> for some long longlonglong long</span></span>
+                <div class="drop-panel">
+                    <div class="auto-fill-item"><span>It<b>e</b>m 1</span></div>
+                    <div class="auto-fill-item"><span>It<b>e</b>m 1</span></div>
+                    <div class="auto-fill-item"><span>Ite<b>m</b> 1</span></div>
+                </div>
+            </div>
+            -->
         </div>
+        <button style="display: inline-block; margin: 0 auto; padding: 0; width: 10%;">Search</button>
         <h4 id="outResult">Result:</h4>
     </div>
     <hr/>
@@ -29,8 +40,45 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.11.1/riot+compiler.min.js"></script>
     <script src="js/nlib.js"></script>
     <script>
-        let elem = document.getElementById('outResult');
-        let autofill = new NGui.AutoFill(elem);
+        let elem = document.getElementById('txtSearch1');
+        let opts = {
+            buttons: [{
+                name: 'main-menu',
+                align: 'left',
+                css: { class: 'fas fa-caret-square-down' },
+                tooltip: 'Main Menu',
+                click: function (evt, autofill, button) {
+                    console.log(autofill, button);
+                    console.log('Main Menu click.');
+                }
+            }, {
+                name: 'select-all',
+                align: 'right',
+                css: { class: 'fas fa-bars' },
+                tooltip: 'Select all',
+                click: function (evt, autofill, button) {
+                    console.log(autofill, button);
+                    console.log('Select all click.');
+                }
+            }]
+        }
+        let items =  [
+            { id: 'A1', name: 'Apple' },
+            { id: 'A2', name: 'Applicot' },
+            { id: 'A3', name: 'Action' },
+            { id: 'A4', name: 'Bison' },
+            { id: 'A5', name: 'Elephen' },
+            { id: 'A6', name: 'Eleven' },
+            { id: 'A7', name: 'Boston' },
+            { id: 'A8', name: 'CPP' },
+            { id: 'A9', name: 'Capture' },
+            { id: 'A10', name: 'Tiger' },
+        ];
+        let autofill = new NGui.AutoFill(elem, opts);
+        autofill.idMember = 'id';
+        autofill.valueMember = 'name';
+        autofill.datasource = items;
+        window.current = autofill;
     </script>
 </body>
 </html>

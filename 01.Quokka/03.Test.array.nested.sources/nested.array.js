@@ -108,7 +108,7 @@ NArray.AutoFilterDataSource = class {
                 this.refresh();
             }
             else {
-                let filter = this._input;
+                let filter = (this.caseSensitive) ? this._input : this._input.toLowerCase();
                 let matchs = vals.filter((elem) => {
                     // The elem is string and in case-sensitive or 
                     // case-insensitive that match user setting.
@@ -377,7 +377,7 @@ NArray.MultiSelectDataSource = class {
 //#endregion
 
 //#region <<< TEST CASE >>> NArray.AutoFilterDataSource
-/*
+
 let items = [
     { id: 'A1', name: 'Apple' },
     { id: 'A2', name: 'Applicot' },
@@ -411,7 +411,7 @@ switch (iCase) {
         arr.datasource = items
         arr.valueMember = 'name'
         arr.caseSensitive = false
-        arr.filter = 'ti'
+        arr.filter = 'TI'
         break;
     case 2: //- simple array
         arr.datasource = items2;
@@ -423,7 +423,7 @@ switch (iCase) {
 
 console.log(arr.items)
 console.log(arr.parts)
-*/
+
 //#endregion
 
 //#region <<< TEST CASE >>> NArray.MultiSelectDataSource
@@ -469,7 +469,7 @@ switch (iCase) {
         arr.idMember = ''
         arr.valueMember = '';
         arr.caseSensitive = false
-        //arr.filter = 'ti'
+        arr.filter = 'ti'
         break;
 }
 //console.log(arr.datasource)
@@ -479,7 +479,7 @@ switch (iCase) {
         arr.selectId('A2');
         arr.selectId('A3');
         arr.selectValue('elevEN');
-        //arr.filter = 'ti'
+        arr.filter = 'ti'
         break;
     case 2: //- simple array
         arr.selectId(1);
@@ -494,7 +494,7 @@ switch (iCase) {
 //console.log(arr.datasource.length);
 //console.log(arr.selectedItems.length)
 //console.log(arr.currentItems.length)
-//console.log(arr.currentItems)
+console.log(arr.currentItems)
 
 //arr.clearSelection();
 //console.log(arr.currentItems)

@@ -1934,7 +1934,7 @@ NArray.AutoFilterDataSource = class {
                 this.refresh();
             }
             else {
-                let filter = this._input;
+                let filter = (this.caseSensitive) ? this._input : this._input.toLowerCase();
                 let matchs = vals.filter((elem) => {
                     // The elem is string and in case-sensitive or 
                     // case-insensitive that match user setting.
@@ -2213,86 +2213,622 @@ class NGui {};
 //#region NGui.AutoFill
 
 NGui.AutoFill = class {
-    constructor(elem) {
+    constructor(elem, options) {
         this._dom = new NDOM(elem);
-        this.init();
+        this._gui = null;
+        this._ds = new NArray.MultiSelectDataSource();
+        this._filterDS = new NArray.AutoFilterDataSource();
+        this._filterDS.caseSensitive = false;
+        let opts = (options) ? options : {};
+        this.init(opts);
     };
     // private methods.
-    init() {
-        if (!this._container) {
-            this._container = new NGui.AutoFill.Container(this);
+    init(options) {
+        let dom = this._dom;
+        dom.class.add('auto-fill'); // add auto-fill css class.
+        // setup listeners.
+        dom.event.add('click', this.click.bind(this));
+        // create related gui elements.
+        if (!this._gui) {
+            let opt = options;
+            // Create gui elements.
+            let gui = {};
+            gui.buttons = {};
+            gui.buttons.left = new NGui.AutoFill.Buttons(this, this);
+            gui.container = new NGui.AutoFill.Container(this, this);
+            gui.buttons.right = new NGui.AutoFill.Buttons(this, this, { align: 'right' });
+
+            if (opt.buttons) {
+                opt.buttons.forEach(btn => {
+                    if (btn.align && btn.align === 'left') {
+                        gui.buttons.left.add(btn);
+                    }
+                    else {
+                        gui.buttons.right.add(btn);
+                    }
+                });
+            }
+
+            gui.input = {};
+            gui.input.filter = new NGui.AutoFill.Input(this, gui.container);
+            gui.input.suggest = new NGui.AutoFill.Suggest(this, gui.container);
+
+            gui.drop = {};
+            gui.drop.panel = new NGui.AutoFill.DropPanel(this, gui.container);
+
+            this._gui = gui;
         }
     };
+    // HTML Element Events
+    click(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.focus();
+        return false;
+    };
     // public methods.
-
+    focus() {
+        if (!this._gui) return;
+        if (!this._gui.input) return;
+        if (!this._gui.input.filter) return;
+        this._gui.input.filter.focus();
+    };
+    get isdroped() {
+        if (!this._gui) return;
+        if (!this._gui.drop) return;
+        if (!this._gui.drop.panel) return;
+        return this._gui.drop.panel.isdroped;
+    }
+    dropdown() {
+        if (!this._gui) return;
+        if (!this._gui.drop) return;
+        if (!this._gui.drop.panel) return;
+        //self.__checkRedirect();
+        this._gui.drop.panel.dropdown();
+    };
+    close() {
+        if (!this._gui) return;
+        if (!this._gui.drop) return;
+        if (!this._gui.drop.panel) return;
+        this._gui.drop.panel.close();
+    };
+    refresh() { };
     // public properties.
     // dom and HTMLElement access.
     get dom() { return this._dom; }
     get elem() { return (this._dom) ? this._dom.elem : null; }
+    // get gui.
+    get gui() { return this._gui; }
+    get filter() {
+        if (!this._gui) return undefined;
+        if (!this._gui.input) return undefined;
+        if (!this._gui.input.filter) return undefined;
+        if (!this._gui.input.filter.dom) return undefined;
+        return this._gui.input.filter.dom.text;
+    }
+    set filter(value) {
+        if (!this._gui) return;
+        if (!this._gui.input) return;
+        if (!this._gui.input.filter) return;
+        if (!this._gui.input.filter.dom) return;
+        if (this._gui.input.filter.text != value) {
+            this._gui.input.filter.text = value;
+            if (this._gui.drop && this._gui.drop.panel)
+                this._gui.drop.panel.refresh();
+        }
+    }
+    // datasource related properties.
+    get datasource() {
+        if (!this._ds) return null;
+        return this._ds.datasource; 
+    }
+    set datasource(value) {
+        if (!this._ds) return;
+        this._ds.datasource = value;
+    }
+    get idMember() {
+        if (!this._ds) return '';
+        return this._ds.idMember;
+    }
+    set idMember(value) {
+        if (!this._ds) return;
+        if (this._ds.idMember != value) {
+            this._ds.idMember = value;
+        }
+    }
+    get selectedItems() {
+        if (!this._ds) return null;
+        return this._ds.selectedItems;
+    }
+    get valueMember() {
+        if (!this._ds) return '';
+        return this._ds.valueMember;
+    }
+    set valueMember(value) {
+        if (!this._ds) return;
+        if (this._ds.valueMember != value) {
+            this._ds.valueMember = value;
+            if (this._filterDS) this._filterDS.valueMember = value;
+        }
+    }
+    get caseSensitive() { 
+        if (!this._ds) return false;        
+        return this._ds.caseSensitive; 
+    }
+    set caseSensitive(value) {
+        if (!this._filterDS) return;
+        if (this._filterDS.caseSensitive != value) {
+            this._filterDS.caseSensitive = value;
+            this._ds.caseSensitive = value;
+        }
+    }
+    get currentItems() {
+        if (!this._ds) return null;
+        if (!this._filterDS) return null;
+        this._filterDS.datasource = this._ds.currentItems;
+        if (this._filterDS.filter != this.filter) {
+            this._filterDS.filter = this.filter;
+        }
+        return this._filterDS.items;
+    }
+    get currentParts() {
+        return this._filterDS.parts;
+    }
 };
 
 //#endregion
 
+//#region NGui.AutoFill.Element (base class)
+
+NGui.AutoFill.Element = class {
+    constructor(autofill, parent, options) {
+        this._autofill = autofill;
+        this._parent = parent;
+        this._options = options;
+        this._dom = this.create(options);
+    };
+    // virtual methods.
+    create() { return null; };
+    // get the autofill instance.
+    get autofill() { return this._autofill; }
+    // get root/parent dom.
+    get root() { return this._autofill; }
+    get parent() { return this._parent; }
+    // get options
+    get options() { return this._options; }
+    // get gui.
+    get gui() { return (this._autofill) ? this._autofill.gui : null; }
+    get dom() { return this._dom; }
+};
+
+//#endregion
+
+//#region NGui.AutoFill.Buttons
+
+NGui.AutoFill.Buttons = class extends NGui.AutoFill.Element {
+    // override methods.
+    create() {        
+        this._buttons = [];
+        if (!this.parent || !this.parent.dom) return null;
+        let opts = this.options;
+        let parent = this.parent.dom;
+        // create new element.
+        let dom = NDOM.create('div');
+        // set css class.
+        dom.class.add('auto-fill-buttons');
+        // set align class.
+        let sAlign = (!opts || !opts.align) ? 'left' : opts.align.trim().toLowerCase();
+        if (sAlign !== 'left') dom.class.add('right'); // right align.
+        // add to parent element.
+        parent.addChild(dom);
+
+        return dom;
+    };
+    // public methods.
+    add(opt) {
+        if (!opt) return;
+        // create child element.
+        let btn = new NGui.AutoFill.Button(this.autofill, this, opt);
+        this._buttons.push(btn);
+    };
+    // public properties
+    get buttons() { return this._buttons; }
+};
+
+//#endregion
+
+//#region  NGui.AutoFill.Button
+
+NGui.AutoFill.Button = class extends NGui.AutoFill.Element {
+    // override methods.
+    create(options) {
+        if (!this.parent || !this.parent.dom) return null;
+        let opt = options;
+        let parent = this.parent.dom;
+        this._name = (opt) ? opt.name : null;
+        // create new element.
+        let dom = NDOM.create('span');
+        // set css class.
+        dom.class.add('auto-fill-button');
+        // set css optional class.
+        let classList = (opt && opt.css && opt.css.class) ? opt.css.class.split(' ') : [];
+        classList.forEach(css => dom.class.add(css));
+        // setup listeners.
+        dom.event.add('click', this.click.bind(this));
+        // set tooltip child element.
+        let sTooltip = (opt) ? opt.tooltip : null;        
+        if (sTooltip && sTooltip.trim().length > 0) {
+            // has tooltip so add tooltip class
+            dom.class.add('tooltip');
+            // create popup tooltip element.
+            let tooltip = NDOM.create('span');
+            tooltip.class.add('tooltiptext');
+            // set text.
+            tooltip.text = sTooltip;
+            // add to button (span) element.
+            dom.addChild(tooltip);
+        }
+        // add to parent element.
+        parent.addChild(dom);
+
+        return dom;
+    };
+    // HTML Element Events
+    click(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        if (this.options && this.options.click) {
+            this.options.click(evt, this.autofill, this);
+        }
+        return false;
+    };
+    // public properties
+    get name() { return this._name; }
+};
+//#endregion
+
 //#region NGui.AutoFill.Container
 
-NGui.AutoFill.Container = class {
-    constructor(parent) {
-        this._parent = parent;
-        this._dom = null;
-        this.init();
+NGui.AutoFill.Container = class extends NGui.AutoFill.Element {
+    // override methods.
+    create(options) {
+        if (!this.parent || !this.parent.dom) return null;
+        let parent = this.parent.dom;
+        let dom = NDOM.create('div');
+        // set css class.
+        dom.class.add('auto-fill-container');
+        // setup listeners.
+        dom.event.add('click', this.click.bind(this));
+        // add to parent element.
+        parent.addChild(dom);
+
+        return dom;
     };
-    // private methods.
-    init() {
-        if (!this._parent) return;
-        if (!this._dom) return;
+    // HTML Element Events
+    click(evt) {
+        if (!this.autofill) return;
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.autofill.focus();
+        return false;
     };
-    // public properties.
-    get parent() { return _parent; }
-    get dom() { return this._dom; }
 };
 
 //#endregion
 
 //#region NGui.AutoFill.Input
 
-NGui.AutoFill.Input = class {
-    constructor(parent) {
-        this._parent = parent;
-        this._dom = null;
-        this.init();
+NGui.AutoFill.Input = class extends NGui.AutoFill.Element {
+    // override methods.
+    create(options) {
+        if (!this.parent || !this.parent.dom) return null;
+        let parent = this.parent.dom;
+        let dom = NDOM.create('span');
+        // set attribute.
+        dom.attr('contenteditable', 'true');
+        // set css class.
+        dom.class.add('input-text');
+        // setup listeners.
+        dom.event.add('focus', this.gotfocus.bind(this));
+        dom.event.add('blur', this.lostfocus.bind(this));
+        dom.event.add('input', this.input.bind(this));
+        dom.event.add('keydown', this.keydown.bind(this));
+        // add to parent element.
+        parent.addChild(dom);
+
+        return dom;
     };
     // private methods.
-    init() {
-        if (!this._parent) return;
-        if (!this._dom) return;
+    setEndOfContenteditable(contentEditableElem) {
+        if (!contentEditableElem) return;
+        var range, sel;
+        if (document.createRange) {
+            range = document.createRange();
+            range.selectNodeContents(contentEditableElem);
+            range.collapse(false);
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (document.selection) {
+            range = document.body.createTextRange();
+            range.moveToElementText(contentEditableElem);
+            range.collapse(false);
+            range.select();
+        }
     };
-    // public properties.
-    get parent() { return this._parent; }
-    get dom() { return this._dom; }
+    updateSuggestion() {
+        if (!this.autofill) return;
+        if (!this.autofill.gui) return;
+        if (!this.autofill.gui.input) return;
+        if (!this.autofill.gui.input.filter) return;
+        if (!this.autofill.gui.input.filter.dom) return;
+        if (!this.autofill.gui.input.suggest) return;
+        if (!this.autofill.gui.input.suggest.dom) return;
+
+        if (!this.autofill.currentItems) return;
+        if (!this.autofill.currentItems.length < 0) return;
+        if (!this.autofill.currentItems[0]) return;
+        let fItem = this.autofill.currentItems[0];
+        let valMember = this.autofill.valueMember;
+        let caseSensitive = this.autofill.caseSensitive;
+
+        let input = this.autofill.gui.input.filter.dom;
+        let suggest = this.autofill.gui.input.suggest.dom;
+        if (input.text === '') {
+            suggest.text = '';
+            return;
+        }
+
+        let ipt = input.text;
+        let text = (valMember) ? String(fItem[valMember]) : String(fItem);
+        let bFound = false;
+
+        //freakin NO-BREAK SPACE needs extra care
+        if (caseSensitive) {
+            bFound = (text && text.indexOf(ipt) === 0);
+        }
+        else {
+            bFound = (text && text.toLowerCase().indexOf(ipt.toLowerCase()) === 0);
+        }
+        if (bFound) {
+            let suggestText = text.substr(ipt.length, text.length);
+            suggest.text = suggestText;
+        }
+        else {
+            suggest.text = '';
+        }
+    };
+    // HTML Element Events
+    gotfocus(evt) {
+        if (!this.autofill) return;
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.autofill.dropdown();
+        return false;
+    };
+    lostfocus(evt) {
+        if (!this.autofill) return;
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.autofill.close();
+        let self = this;        
+        if (self.autofill && self.autofill.dom) {
+            let root = self.autofill.dom;
+            root.class.remove('focused');
+        }
+        
+        return false;
+    };
+    input(evt) {
+        if (!this.autofill) return;
+        let autofill = this.autofill;
+        if (!autofill.isdroped) autofill.dropdown();
+        this.updateSuggestion();
+        autofill.filter = this.dom.text;
+    };
+    keydown(evt) { };
+    // public methods
+    focus() {
+        if (!this.dom || !this.dom.elem) return;
+        this.setEndOfContenteditable(this.dom.elem);
+        let self = this;        
+        setTimeout(function () {
+            if (self.autofill && self.autofill.dom) {
+                let root = self.autofill.dom;
+                root.class.add('focused');
+            }
+            self.dom.focus();
+        }, 0);
+    };
+};
+
+//#endregion
+
+//#region NGui.AutoFill.Suggest
+
+NGui.AutoFill.Suggest = class extends NGui.AutoFill.Element {
+    // override methods.
+    create(options) {
+        if (!this.parent || !this.parent.dom) return null;
+        let parent = this.parent.dom;
+        let dom = NDOM.create('span');
+        // set css class.
+        dom.class.add('suggest-text');
+        // add to parent element.
+        parent.addChild(dom);
+
+        return dom;
+    };
 };
 
 //#endregion
 
 //#region NGui.AutoFill.DropPanel
 
-NGui.AutoFill.DropPanel = class {
-    constructor(parentDOM) {
-        this._parent = parent;
-        this._dom = null;
-        this.init();
+NGui.AutoFill.DropPanel = class extends NGui.AutoFill.Element {
+    // override methods.
+    create(options) {
+        this._items = [];
+        if (!this.parent || !this.parent.dom) return null;
+        let parent = this.parent.dom;
+        let dom = NDOM.create('div');
+        // set css class.
+        dom.class.add('drop-panel');
+        dom.class.add('hide');
+        // add to parent element.
+        parent.addChild(dom);
+
+        return dom;
     };
-    // private methods.
-    init() {
-        if (!this._parent) return;
-        if (!this._dom) return;
+    // public methods.
+    get isdroped() {
+        if (!this.dom) return false;
+        let isHide = this.dom.class.has('hide');
+        return !isHide;
     };
-    // public properties.
-    get parent() { return this._parent; }
-    get dom() { return this._dom; }
+    dropdown() {
+        if (!this.dom) return;
+        let dom = this.dom;
+        dom.class.remove('hide');
+
+        if (!this.autofill || !this.autofill.gui) return null;
+        if (!this.autofill.gui.buttons) return;
+        if (!this.autofill.gui.buttons.left) return;
+        if (!this.autofill.gui.buttons.left.dom) return;
+        if (!this.autofill.gui.buttons.right) return;
+        if (!this.autofill.gui.buttons.right.dom) return;
+        let lfdom = this.autofill.gui.buttons.left.dom;
+        let rtdom = this.autofill.gui.buttons.right.dom;
+        // recalc position.
+        let left = -lfdom.offsetWidth - 9;
+        let right = rtdom.offsetWidth - 4;
+        // update position.
+        dom.style('left', left + 'px');
+        dom.style('right', right + 'px');
+        //dom.style('top', top + 'px');
+        this.refresh();
+    };
+    clear() {
+        this.dom.clearChildren();
+        this._items.splice(0);
+    };
+    // unselectAll() {
+    //     if (!this._items) return;
+    //     this._items.forEach(item => {
+    //         item.dom.class.remove('selected');
+    //     });
+    // };
+    refresh() {
+        this.clear();
+        if (!this.autofill || !this.autofill.datasource) return;
+        let items = this.autofill.currentItems;
+        let parts = this.autofill.currentParts;
+        if (items && items.length > 0) {
+            let self = this;
+            let idx = 0;
+            items.forEach(item => {
+                let afItem = new NGui.AutoFill.AutoFillItem(self.autofill, self, {
+                    index: idx,
+                    item: item,
+                    part: parts[idx]
+                })
+                if (idx === 0) afItem.selected();
+                this._items.push(afItem);
+                idx++;
+            });
+        };
+    };
+    close() {
+        if (!this.dom) return;
+        this.dom.class.add('hide');
+    };
+    // public properties
+    get items() { return this._items; }
 }
 
 //#endregion
 
+//#region AutoFillItem
+
+NGui.AutoFill.AutoFillItem = class extends NGui.AutoFill.Element {
+    // override methods.
+    create(options) {
+        this._item = null;
+        this._selected = false;
+        if (!this.autofill || !this.autofill.datasource) return;
+        if (!this.parent || !this.parent.dom) return null;
+        if (!options || !options.item || !options.part) return;
+        if (!this.gui || !this.gui.input) return;
+        if (!this.gui.input.filter || !this.gui.input.filter.dom) return;
+        let parent = this.parent.dom;
+
+        let item = options.item;
+        let part = options.part;
+
+        this._item = item; // assigned item.
+
+        let dom = NDOM.create('div');
+        // set css class.
+        dom.class.add('auto-fill-item');
+        dom.attr('href', 'javascript:;');
+        
+        let preSpan = NDOM.create('span');
+        preSpan.text = part.pre;
+        dom.addChild(preSpan);
+
+        let inputBold = NDOM.create('b');
+        inputBold.text = part.match;
+        dom.addChild(inputBold);
+
+        let postSpan = NDOM.create('span');
+        postSpan.text = part.post;
+        dom.addChild(postSpan);
+        
+        // setup listeners.
+        let self = this;
+        dom.event.add('mousedown', self.mousedown.bind({
+            self: self,
+            target: dom.elem,
+            item: item
+        }));
+        dom.event.add('mouseup', self.mouseup.bind({
+            self: self,
+            target: dom.elem,
+            item: item
+        }));
+
+        // add to parent element.
+        parent.addChild(dom);
+
+        return dom;
+    };
+    // HTML Element Events
+    mousedown(evt) {
+        let pObj = this;
+        console.log(pObj);
+    }
+    mouseup(evt) {
+        let pObj = this;
+        console.log(pObj);
+    }
+    // public methods.
+    selected() {
+        if (!this.dom) return;
+        // let hasParent = (this.autofill) ? true : false;
+        // hasParent = hasParent && (this.autofill.gui) ? true : false;
+        // hasParent = hasParent && (this.autofill.gui.drop) ? true : false;
+        // hasParent = hasParent && (this.autofill.gui.drop.panel) ? true : false;
+        // if (hasParent) {
+        //     let dropPanel = this.autofill.gui.drop.panel;
+        //     dropPanel.unselectAll();
+        // }
+        this.dom.class.add('selected');
+        this._selected = true;
+    }
+    // public properties.
+    get item() { return this._item; }
+}
 
 //#endregion
 
+//#endregion
