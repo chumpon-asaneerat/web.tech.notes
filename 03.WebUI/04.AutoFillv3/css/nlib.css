@@ -191,3 +191,121 @@
 .drop-panel .auto-fill-item.selected span b {
     color: whitesmoke;
 }
+
+/* TAGBOX */
+.tag-box {
+    display: block;
+    margin: 0 auto;
+    padding: 2px;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.tag-box.hide {
+    display: none;
+}
+
+.tag-box .tag-left-col {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0px;
+    width: 150px;
+    vertical-align: top;
+}
+
+.tag-box .tag-right-col {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0px;
+    width: calc(100% - 150px);
+    vertical-align: top;
+}
+
+.tag-box .tag-left-col .tag-clear {
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    margin: 0 auto;
+    margin-top: -14px;
+    margin-left: 0.3em;
+    padding: 0;
+    width: 15px;
+    height: 15px;
+    border-width: 3px;
+    border-style: solid;
+    border-color: red;
+    border-radius: 100%;
+    background: linear-gradient(-45deg, transparent 0%, transparent 46%, white 46%, white 56%, transparent 56%, transparent 100%), linear-gradient(45deg, transparent 0%, transparent 46%, white 46%, white 56%, transparent 56%, transparent 100%);
+    background-color: red;
+    box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.tag-box .tag-left-col .tag-caption {
+    display: inline-block;
+    margin: 0 auto;
+    margin-left: 5px;
+    padding: 1px 8px;
+    padding-bottom: 2px;
+    color: whitesmoke;
+    background-color: cornflowerblue;
+    border-radius: 5px;
+    width: calc(100% - 42px);
+    text-align: right;
+    text-overflow: ellipsis;
+    /* Required for text-overflow to do anything */
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: default;
+}
+
+.tag-box .tag-right-col .tag-item {
+    display: inline-block;
+    margin: 2px auto;
+    margin-top: 0px;
+    margin-left: 1px;
+    margin-right: 1px;
+    padding: 1px 5px;
+    color: whitesmoke;
+    /* font-weight: bold; */
+    background-color: #119911;
+    border-radius: 5px;
+}
+
+.tag-box .tag-right-col .tag-item.invalid {
+    background-color: dimgray;
+}
+
+.tag-box .tag-right-col .tag-item .tag-text {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0;
+    padding-bottom: 1px;
+    margin-left: 0.2em;
+    color: whitesmoke;
+    cursor: default;
+}
+
+.tag-box .tag-right-col .tag-item .tag-close {
+    display: inline-block;
+    margin: 0 auto;
+    margin-left: 0.3em;
+    margin-right: 0.1em;
+    transform: scale(1.1, 0.9);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: whitesmoke;
+    cursor: pointer;
+}
+
+.tag-box .tag-right-col .tag-item .tag-close::after {
+    font-family: Arial, Helvetica, sans-serif;
+    content: 'x';
+}
+
+.tag-box .tag-right-col .tag-item .tag-close:hover {
+    cursor: pointer;
+    color: red;
+}
