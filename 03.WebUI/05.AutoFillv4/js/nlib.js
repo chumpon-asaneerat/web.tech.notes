@@ -1824,6 +1824,8 @@ NDOM.Fluent = class {
 
 //#endregion
 
+//#region NArray and related classes
+
 //#region NArray
 
 class NArray { };
@@ -2249,6 +2251,60 @@ NArray.MultiSelectDataSource = class {
 
 //#endregion
 
+//#region NArray.DynamicDataSource
+
+NArray.DynamicDataSource = class {
+    constructor() {
+        this._currentChanged = new EventHandler();
+        this._selectionChanged = new EventHandler();
+        this.init();
+    };
+    // protected methods.
+    init() {};
+    // event raisers.
+    raiseCurrentChanged() {
+        if (this._currentChanged) this._currentChanged.invoke(this, EventArgs.Empty);
+    };
+    raiseSelectionChanged() {
+        if (this._selectionChanged) this._selectionChanged.invoke(this, EventArgs.Empty);
+    };
+    // public events.
+    get currentChanged() { return this._currentChanged; }
+    get selectionChanged() { return this._selectionChanged; }
+};
+
+//#endregion
+
+//#region NArray.SingleItemDataSource
+
+NArray.SingleItemDataSource = class extends NArray.DynamicDataSource {
+};
+
+//#endregion
+
+//#region NArray.MultiItemDataSource
+
+NArray.MultiItemDataSource = class extends NArray.DynamicDataSource {
+};
+
+//#endregion
+
+//#region NArray.DateItemDataSource - for single date selection
+
+NArray.DateItemDataSource = class extends NArray.DynamicDataSource {
+};
+
+//#endregion
+
+//#region NArray.PeriodItemDataSource - for begin/end date selection
+
+NArray.DateItemDataSource = class extends NArray.DynamicDataSource {
+};
+
+//#endregion
+
+//#endregion
+
 //#region NGui and related classes
 
 //#region NGui
@@ -2267,7 +2323,7 @@ NGui.AutoFill = class {
         this._gui = null;
         this._ds = new NArray.MultiSelectDataSource();
         this._filterDS = new NArray.AutoFilterDataSource();
-        this._filterDS.caseSensitive = false;        
+        this._filterDS.caseSensitive = false;
         let opts = (options) ? options : {};
 
         this._selectionChanged = new EventHandler();
