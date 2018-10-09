@@ -1832,6 +1832,48 @@ class NArray { };
 
 //#endregion
 
+//#region NArray.Date (helper for generate date related array)
+
+NArray.Date = class {
+    static get currentYear() { return Number(new Date().getFullYear()); };
+    static getYears(delta, asObj) {
+        let currYr = Number(new Date().getFullYear());
+        let idalta = (delta) ? delta : 5;
+        let stYr = currYr - idalta;
+        let edYr = currYr + idalta;
+        let years = [];
+        for (let i = stYr; i <= edYr; i++) {
+            if (asObj)
+                years.push({ id:i, text: String(i) });
+            else years.push(i);
+        }
+        return years;
+    };
+    static getMonths(asObj) {
+        let results = [];
+        for(var i = 1; i <= 12; i++) {
+            if (asObj)
+                results.push({ id:i, text: String(i) });
+            else results.push(i);
+        }
+        return results;
+    };
+    static getDays(year, month, asObj) {
+        let results = [];
+        if (!year) return results;
+        if (!month) return results;
+        let maxDays = new Date(year, month, 0).getDate();
+        for(var i = 1; i <= maxDays; i++) {
+            if (asObj)
+                results.push({ id:i, text: String(i) });
+            else results.push(i);
+        }
+        return results;
+    };
+};
+
+//#endregion
+
 //#region NArray.CaseSensitiveDataSource
 
 NArray.CaseSensitiveDataSource = class {

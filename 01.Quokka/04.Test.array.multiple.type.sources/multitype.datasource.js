@@ -149,6 +149,48 @@ class NArray { };
 
 //#endregion
 
+//#region NArray.Date (helper for generate date related array)
+
+NArray.Date = class {
+    static get currentYear() { return Number(new Date().getFullYear()); };
+    static getYears(delta, asObj) {
+        let currYr = Number(new Date().getFullYear());
+        let idalta = (delta) ? delta : 5;
+        let stYr = currYr - idalta;
+        let edYr = currYr + idalta;
+        let years = [];
+        for (let i = stYr; i <= edYr; i++) {
+            if (asObj)
+                years.push({ id:i, text: String(i) });
+            else years.push(i);
+        }
+        return years;
+    };
+    static getMonths(asObj) {
+        let results = [];
+        for(var i = 1; i <= 12; i++) {
+            if (asObj)
+                results.push({ id:i, text: String(i) });
+            else results.push(i);
+        }
+        return results;
+    };
+    static getDays(year, month, asObj) {
+        let results = [];
+        if (!year) return results;
+        if (!month) return results;
+        let maxDays = new Date(year, month, 0).getDate();
+        for(var i = 1; i <= maxDays; i++) {
+            if (asObj)
+                results.push({ id:i, text: String(i) });
+            else results.push(i);
+        }
+        return results;
+    };
+};
+
+//#endregion
+
 //#region NArray.CaseSensitiveDataSource
 
 NArray.CaseSensitiveDataSource = class {
@@ -567,5 +609,182 @@ NArray.MultiSelectDataSource = class {
 };
 
 //#endregion
+
+//#endregion
+
+//#region NArray.Date - Test
+/*
+console.log(NArray.Date.currentYear);
+let years = NArray.Date.getYears(2);
+console.log(years);
+let months = NArray.Date.getMonths();
+console.log(months);
+let days = NArray.Date.getDays(2000, 4);
+console.log(days);
+*/
+//#endregion
+
+//#region NArray.MultiLevelDataSource
+
+NArray.MultiLevelDataSource = class {
+    // protected metohods
+};
+
+//#endregion
+
+//#region NArray.MultiLevelDataSource - Test
+/*
+let ds = new NArray.MultiLevelDataSource();
+*/
+//#endregion
+
+//#region NArray.DateValueDataSource
+
+NArray.DateValueDataSource = class {
+    constructor() {
+        this._yy = '';
+        this._mm = '';
+        this._dd = '';
+        this._type = '';
+        this._valueMember = '';
+        this._items = null;
+    };
+    clear() {
+        this._yy = '';
+        this._mm = '';
+        this._dd = '';
+        this._type = '';
+        this._items = null;
+    };    
+    // public properties.
+    get year() { return this._yy; }
+    set year(value) {
+        if (this._yy !== value) {
+            this._yy = value;
+        }
+    }
+    get month() { return this._mm; }
+    set month(value) {
+        if (this.__mmyy !== value) {
+            this._mm = value;
+        }
+    }
+    get day() { return this._dd; }
+    set day(value) {
+        if (this._dd !== value) {
+            this._dd = value;
+        }
+    }
+    // array management methods
+    selectIndex(index) {
+        let items = this.items;
+        if (!items) return;
+        if (index < 0 || index >= items.length) return;
+        let item = items[index];
+        this.selectItem(item);
+    }
+    selectItem(item) {
+        let sVal = this._valueMember;
+        let asObj = (sVal && sVal.trim().length > 0) ? true : false;
+        let pName = (asObj) ? sVal.trim() : null;
+        if (this._type === 'yy') {
+            this._yy = (pName) ? item[pName] : item;
+            this._type = 'mm';
+            this._items = null;
+        }
+        else if (this._type === 'mm') {
+            this._mm = (pName) ? item[pName] : item;
+            this._type = 'dd';
+            this._items = null;
+        }
+        else if (this._type === 'dd') {
+            this._dd = (pName) ? item[pName] : item;
+            this._type = '';
+            this._items = null;
+        }
+        else {
+            this._type = '';
+            this._items = null;
+        }
+    };
+    get items() {
+        if (!this._items) {
+            let sVal = this._valueMember;
+            let asObj = (sVal && sVal.trim().length > 0) ? true : false;
+            if (this._type === '' || this._type === 'yy') {
+                if (this._type !== 'yy') this._type = 'yy';
+                this._items = NArray.Date.getYears(5, asObj);
+            }
+            else if (this._type === 'mm') {
+                this._items = NArray.Date.getMonths(asObj);
+            }        
+            else if (this._type === 'dd') {
+                let sYr = (this._yy) ? String(this._yy) : '';
+                let sMn = (this._mm) ? String(this._mm) : '';
+                if (sYr.length === 4 && sMn.length > 0) {
+                    this._items = NArray.Date.getDays(Number(this._yy), Number(this._mm), asObj);
+                }
+            }
+        }
+        return this._items;
+    }
+    get current() {
+        return this._yy + '-' + this._mm + '-' + this._dd;
+    }
+    get valueMember() { return this._valueMember; }
+    set valueMember(value) {
+        if (this._valueMember !== value) {
+            this._valueMember = value;
+        }
+    }
+};
+
+//#endregion
+
+//#region NArray.DateValueDataSource - Test
+/*
+let ds = new NArray.DateValueDataSource();
+ds.valueMember = 'text'
+let items;
+
+ds.clear();
+//items = ds.items;
+//console.log(items);
+ds.selectIndex(2);
+//items = ds.items;
+//console.log(items);
+ds.selectIndex(2);
+//items = ds.items;
+//console.log(items);
+ds.selectIndex(12);
+//items = ds.items;
+//console.log(items);
+console.log(ds.current);
+*/
+//#endregion
+
+//#region NArray.DatePeriodDataSource
+
+NArray.DatePeriodDataSource = class {
+    constructor() {
+        this._begin = new NArray.DateValueDataSource();
+        this._end = new NArray.DateValueDataSource();
+    };
+
+    get begin() { return this._begin; }
+    get end() { return this._end; }
+
+    get valueMember() { return this._begin._valueMember; }
+    set valueMember(value) {
+        if (this._begin._valueMember !== value) {
+            this._begin._valueMember = value;
+            this._end._valueMember = value;
+        }
+    }
+};
+
+//#endregion
+
+//#region NArray.DatePeriodDataSource - Test
 
 //#endregion
