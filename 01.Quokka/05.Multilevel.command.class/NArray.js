@@ -1,3 +1,5 @@
+//#region NArray and related classes
+
 //#region NArray
 
 class NArray {
@@ -205,6 +207,72 @@ class NArray {
         return results;
     };
 };
+
+//#endregion
+
+//#region NArray.Date (helper for generate date related array)
+
+NArray.Date = class {
+    /**
+     * Gets Current Year.
+     */
+    static get currentYear() { return Number(new Date().getFullYear()); };
+    /**
+     * Create array of past years from current year with specificed parameter.
+     * i.e. if delta is 2 and current year is 2012 the result is 2010, 2011, 2012.
+     * 
+     * @param {Number} delta The number of past years to generate.
+     * @param {Boolean} asObj True to returns object instead of single value. Default is true.
+     */
+    static getYears(delta, asObj = true) {
+        let currYr = Number(new Date().getFullYear());
+        let idalta = (delta) ? delta : 5;
+        let stYr = currYr - idalta;
+        let edYr = currYr;
+        let years = [];
+        for (let i = stYr; i <= edYr; i++) {
+            if (asObj)
+                years.push({ id:i, text: String(i) });
+            else years.push(i);
+        }
+        return years;
+    };
+    /**
+     * Gets Month array.
+     * 
+     * @param {Boolean} asObj True to returns object instead of single value. Default is true.
+     */
+    static getMonths(asObj = true) {
+        let results = [];
+        for(var i = 1; i <= 12; i++) {
+            if (asObj)
+                results.push({ id:i, text: String(i) });
+            else results.push(i);
+        }
+        return results;
+    };
+    /**
+     * Gets days array by specificed year and month.
+     * 
+     * @param {Number} year The target year.
+     * @param {Number} month The target month.
+     * @param {Boolean} asObj True to returns object instead of single value. Default is true.
+     */
+    static getDays(year, month, asObj = true) {
+        let results = [];
+        if (!year) return results;
+        if (!month) return results;
+        let maxDays = new Date(year, month, 0).getDate();
+        for(var i = 1; i <= maxDays; i++) {
+            if (asObj)
+                results.push({ id:i, text: String(i) });
+            else results.push(i);
+        }
+        return results;
+    };
+};
+
+//#endregion
 
 //#endregion
 
@@ -428,5 +496,15 @@ console.log(results);
 //#endregion
 
 //#endregion
+
+//#region NArray.Date - Test
+
+console.log(NArray.Date.currentYear);
+let years = NArray.Date.getYears(2);
+console.log(years);
+let months = NArray.Date.getMonths();
+console.log(months);
+let days = NArray.Date.getDays(2000, 4);
+console.log(days);
 
 //#endregion
