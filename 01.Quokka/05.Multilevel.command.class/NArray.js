@@ -8,7 +8,7 @@ class NArray {
      * @param {String} member The element property's name to get value.
      * @param {Boolean} lowerCase true for convert value to lowercase.
      */
-    static map(items, member, lowerCase) {
+    static map(items, member, lowerCase = true) {
         let results = null;
         if (!items) return results;
         // inline helper function.
@@ -20,6 +20,37 @@ class NArray {
             return (isString(val) && lowerCase) ? String(val).toLowerCase() : val;
         });
         return results;
+    };
+    /**
+     * Create multiple value maps for spefificed array.
+     * 
+     * @param {Array} items The source items.
+     * @param {Array} members The member name array to gernate map array.
+     * @param {Boolean} lowerCase True for convert value to string lowercase.
+     */
+    static maps(items, members, lowerCase = true) {
+        let result = null;
+        let isArray = value => (value instanceof Array);
+        let isString = value => (typeof value === 'string');
+        if (!items || items.length <= 0) return result;
+        let omembers;
+        let bValue = isString(members);
+        if (bValue) omembers = [ members ];
+        let bArray = isArray(members);
+        if (bArray) omembers = members;
+        if (!omembers) return result; // cannot create member array.
+        // create lookup object
+        result = {};
+        items.forEach(item => {
+            omembers.forEach(omember => {
+                let smem = String(omember);
+                if (!result[smem]) result[smem] = [];
+                let oVal = String(item[smem]);
+                let sVal = (lowerCase) ? oVal.toLowerCase() : oVal;
+                result[smem].push(sVal);
+            })
+        });
+        return result;
     };
     /**
      * Create new array from source array with exclude items or values in exclude array.
@@ -111,6 +142,68 @@ class NArray {
         result.parts = parts;
         return result;
     };
+    /**
+     * Gets array which all items in source array that has all members's value match in lookup array.
+     * The source array is acts like child table in database.
+     * The lookup array is acts like master table in database.
+     * 
+     * @param {Array} items The source (or child) array.
+     * @param {Array} members The source Mambers
+     * @param {Array} lookupItems The lookup (or master) array.
+     * @param {Array} lookupMembers The lookup Members
+     * @param {Boolean} ignoreCase true for ignore case with compare.
+     */
+    static inArray(items, members, lookupItems, lookupMembers, ignoreCase = true) {
+        let results = null;
+        let isArray = value => (value instanceof Array);
+        let isString = value => (typeof value === 'string');
+
+        if (!isArray(items)) return results;
+        if (!isArray(lookupItems)) return results;
+
+        if (!items || items.length <= 0) return results;
+        if (!lookupItems || lookupItems.length <= 0) return results;
+
+        let smembers, lmembers;
+
+        let bothIsValue = (isString(members) && isString(lookupMembers));
+        if (bothIsValue) {
+            // make an local array.
+            smembers = [ members ];
+            lmembers = [ lookupMembers ];
+        }
+
+        let bothIsArray = (isArray(members) && isArray(lookupMembers));
+        if (bothIsArray) {
+            if (members && lookupMembers && members.length !== lookupMembers.length) {
+                console.error('Number of members not match');
+                return results;
+            }
+            // set to local array.
+            smembers = members;
+            lmembers = lookupMembers;
+        }
+
+        if (!smembers || !lmembers) return results; // cannot create both member array.
+        // create lookup object
+        let lookup = NArray.maps(lookupItems, lookupMembers, ignoreCase);
+
+        results = items.filter(item => {
+            let matchCnt = 0;
+            for (let i = 0; i < smembers.length; ++i) {
+                let smember = String(smembers[i]);
+                let dmember = String(lmembers[i]);
+                let oVal = String(item[smember]);
+                let sVal = (ignoreCase) ? oVal.toLowerCase() : oVal;
+                // find is current src item's value is in desc value lookup array.
+                let idx = lookup[dmember].indexOf(sVal)
+                if (idx !== -1) matchCnt++; // found so increase match count.
+            }
+            return (matchCnt === smembers.length);
+        });
+
+        return results;
+    };
 };
 
 //#endregion
@@ -125,6 +218,7 @@ let ds2 = [{ id: 1, text: 'One'}, { id: 2, text: 'Two'}]
 console.log(NArray.map(ds2))
 console.log(NArray.map(ds2, 'text'))
 console.log(NArray.map(ds2, 'text', true))
+console.log(NArray.map(ds2, 'text', false))
 */
 //#endregion
 
@@ -211,4 +305,128 @@ console.log(result.values);
 console.log(result.indexes);
 console.log(result.parts);
 */
+//#endregion
+
+//#region NArray.maps - Test
+/*
+let choices = [
+    // QSet 1 - Quest 1 (3 choices)
+    { qsetId: 'QS001', qSeq: 1, qSSeq: 1, 'c-Text': 'C11' },
+    { qsetId: 'QS001', qSeq: 1, qSSeq: 2, 'c-Text': 'C12' },
+    { qsetId: 'qs001', qSeq: 1, qSSeq: 3, 'c-Text': 'C13' }, // make misspell case sensitive
+    // QSet 1 - Quest 2 (2 choices)
+    { qsetId: 'QS001', qSeq: 2, qSSeq: 1, 'c-Text': 'C21' },
+    { qsetId: 'QS001', qSeq: 2, qSSeq: 2, 'c-Text': 'C22' },
+    // QSet 2 - Quest 1 (4 choices)
+    { qsetId: 'QS002', qSeq: 1, qSSeq: 1, 'c-Text': 'C31' },
+    { qsetId: 'QS002', qSeq: 1, qSSeq: 2, 'c-Text': 'C32' },
+    { qsetId: 'qS002', qSeq: 1, qSSeq: 3, 'c-Text': 'C33' }, // make misspell case sensitive
+    { qsetId: 'Qs002', qSeq: 1, qSSeq: 4, 'c-Text': 'C34' }, // make misspell case sensitive
+    // QSet 2 - Quest 2 (3 choices)
+    { qsetId: 'QS002', qSeq: 2, qSSeq: 1, 'c-Text': 'C41' },
+    { qsetId: 'QS002', qSeq: 2, qSSeq: 2, 'c-Text': 'C42' },
+    { qsetId: 'QS002', qSeq: 2, qSSeq: 3, 'c-Text': 'C43' }
+]
+let lookup = NArray.maps(choices, ['qsetId', 'qSeq', 'qSSeq', 'c-Text'], false);
+console.log(lookup);
+*/
+//#endregion
+
+//#region NArray.inArray - Tests
+
+//#region NArray.inArray - Test Case single member
+/*
+let branchs = [
+    { branchId: 'B0001', branchName: 'BKK' },
+    { branchId: 'B0002', branchName: 'Nontaburi' },
+    { branchId: 'B0003', branchName: 'Tak' }
+]
+
+let orgs = [
+    // Branch 1
+    { branchId: 'B0001', orgId: 'O0001', orgName: 'HQ' },
+    { branchId: 'B0001', orgId: 'O0002', orgName: 'Financial' },
+    { branchId: 'B0001', orgId: 'O0003', orgName: 'Accounting' },
+    { branchId: 'B0001', orgId: 'O0010', orgName: 'Service 1' }, // assume add later
+    { branchId: 'B0001', orgId: 'O0011', orgName: 'PR 1' }, // assume add later
+    // Branch 2
+    { branchId: 'B0002', orgId: 'O0004', orgName: 'Marketting 2' },
+    { branchId: 'B0002', orgId: 'O0005', orgName: 'Service 2' },
+    { branchId: 'B0002', orgId: 'O0006', orgName: 'PR 2' },
+    { branchId: 'B0002', orgId: 'O0012', orgName: 'Supports 2' }, // assume add later
+    // Branch 3
+    { branchId: 'B0003', orgId: 'O0004', orgName: 'Marketting 3' },
+    { branchId: 'B0003', orgId: 'O0008', orgName: 'Service 3' },
+    { branchId: 'B0003', orgId: 'O0009', orgName: 'PR 3' }
+]
+
+let selectBranchs = [branchs[1]]; // only branch 2
+//let members = lookupMembers = 'branchId'; // string
+let members = lookupMembers = ['branchId']; // array
+let results
+//##-> use single member
+//results = NArray.inArray(orgs, members, selectBranchs, lookupMembers);
+//##-> use multiple members (array required).
+results = NArray.inArray(orgs, members, selectBranchs, lookupMembers);
+console.log(results);
+*/
+//#endregion
+
+//#region NArray.inArray - Test Case multiple member
+/*
+let qsets = [
+    { qsetId: "QS001", qsetText: "Question Set 1" },
+    { qsetId: "QS002", qsetText: "Question Set 2" }
+]
+
+let questions = [
+    // QSet 1
+    { qsetId: 'QS001', qSeq: 1, qText: 'Q1' },
+    { qsetId: 'QS001', qSeq: 2, qText: 'Q2' },
+    // QSet 2
+    { qsetId: 'qs002', qSeq: 1, qText: 'Q3' }, // make misspell case sensitive
+    { qsetId: 'QS002', qSeq: 2, qText: 'Q4' }
+]
+
+let choices = [
+    // QSet 1 - Quest 1 (3 choices)
+    { qsetId: 'QS001', qSeq: 1, qSSeq: 1, cText: 'C11' },
+    { qsetId: 'QS001', qSeq: 1, qSSeq: 2, cText: 'C12' },
+    { qsetId: 'qs001', qSeq: 1, qSSeq: 3, cText: 'C13' }, // make misspell case sensitive
+    // QSet 1 - Quest 2 (2 choices)
+    { qsetId: 'QS001', qSeq: 2, qSSeq: 1, qText: 'C21' },
+    { qsetId: 'QS001', qSeq: 2, qSSeq: 2, cText: 'C22' },
+    // QSet 2 - Quest 1 (4 choices)
+    { qsetId: 'QS002', qSeq: 1, qSSeq: 1, qText: 'C31' },
+    { qsetId: 'QS002', qSeq: 1, qSSeq: 2, qText: 'C32' },
+    { qsetId: 'qS002', qSeq: 1, qSSeq: 3, qText: 'C33' }, // make misspell case sensitive
+    { qsetId: 'Qs002', qSeq: 1, qSSeq: 4, qText: 'C34' }, // make misspell case sensitive
+    // QSet 2 - Quest 2 (3 choices)
+    { qsetId: 'QS002', qSeq: 2, qSSeq: 1, qText: 'C41' },
+    { qsetId: 'QS002', qSeq: 2, qSSeq: 2, qText: 'C42' },
+    { qsetId: 'QS002', qSeq: 2, qSSeq: 3, qText: 'C43' }
+]
+
+let selQSets;
+let filterQues;
+let selQues;
+let results
+
+selQSets = [ qsets[1] ] // select qset 2
+filterQues = NArray.inArray(questions, ['qsetId'], selQSets, ['qsetId']); // ignore case
+//filterQues = NArray.inArray(questions, ['qsetId'], selQSets, ['qsetId'], false); // case-sensitive
+//console.log(filterQues);
+
+let members = lookupMembers = ['qsetId', 'qSeq']
+//selQues = [ filterQues[0] ] // select qset 2, question 1
+selQues = [ filterQues[0], filterQues[1] ] // select qset 2, question 1 and 2
+//selQues = [ questions[2] ]
+//results = NArray.inArray(choices, members, selQues, lookupMembers); // ignore case
+results = NArray.inArray(choices, members, selQues, lookupMembers, false); // case-sensitive
+console.log(results);
+*/
+//#endregion
+
+//#endregion
+
 //#endregion
