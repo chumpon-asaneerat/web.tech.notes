@@ -498,7 +498,7 @@ console.log(results);
 //#endregion
 
 //#region NArray.Date - Test
-
+/*
 console.log(NArray.Date.currentYear);
 let years = NArray.Date.getYears(2);
 console.log(years);
@@ -506,5 +506,15 @@ let months = NArray.Date.getMonths();
 console.log(months);
 let days = NArray.Date.getDays(2000, 4);
 console.log(days);
+*/
+//#endregion
 
+//#region moment.js - Test
+/*
+const moment = require('moment')
+
+moment.locale('th')
+console.log(moment.months())
+console.log(moment().format('[today] dddd MMMM YYYY'))
+*/
 //#endregion
