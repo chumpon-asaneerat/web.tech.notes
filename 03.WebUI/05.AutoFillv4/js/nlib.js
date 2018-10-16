@@ -2006,6 +2006,28 @@ class NArray {
 
         return results;
     };
+    /**
+     * Find index of item in source array.
+     * 
+     * @param {Array} items The source array to find index.
+     * @param {String} member The element property's name to get value.
+     * @param {Object} item The item to find index.
+     * @param {Boolean} lowerCase true for convert value to lowercase.
+     */
+    static indexOf(items, member, item, lowerCase = true) {
+        let idx = -1;
+        if (!items) return idx;
+        if (!item) return idx;
+        let map = NArray.map(items, member, lowerCase);
+        if (!map) return idx;
+        // inline helper function.
+        let isString = value => (typeof value === 'string');
+        let hasMember = (item, name) => (Object.keys(item).indexOf(name) !== -1);
+        let val = (member && hasMember(item, member)) ? item[member] : item;
+        let sVal = (isString(val) && lowerCase) ? String(val).toLowerCase() : val;
+        idx = map.indexOf(sVal);
+        return idx;
+    };
 };
 
 //#endregion
@@ -2118,6 +2140,7 @@ NGui.TagBox = class {
         this._dom = new NDOM(elem);
 
         this._caption = 'Category';
+        this._itemSeparator = '';
         this._valueMember = '';
         this._items = null;
 
@@ -2176,6 +2199,15 @@ NGui.TagBox = class {
             this.refresh(); // resets related items.
         }
     }
+    // gets or sets item separator.
+    get itemSeparator() { return this._itemSeparator; }
+    set itemSeparator(value) {
+        if (this._itemSeparator != value) {
+            this._itemSeparator = value;
+            this.refresh(); // resets related items.
+        }
+    }
+    // gets or sets value member.
     // gets or sets value member.
     get valueMember() { return this._valueMember; }
     set valueMember(value) {
@@ -2278,9 +2310,18 @@ NGui.TagBox.Items = class {
         if (!items) return;
         let self = this;
         let itemdom = null;
+        let hasSeperator = (this.tagbox.itemSeparator) ? true : false;
+        let iCnt = 0, iMax = (items) ? items.length : 0;
         items.forEach(item => {            
             itemdom = new NGui.TagBox.Item(self, item);
             itemdom.text = (hasMember) ? String(item[pName]) : String(item);
+            if (hasSeperator && (iCnt + 1 !== iMax)) {
+                let sepdom = NDOM.create('span');
+                sepdom.class.add('tag-seperator');
+                sepdom.text = this.tagbox.itemSeparator;
+                dom.addChild(sepdom);
+            }
+            ++iCnt;
         });
     };
     // public properties.

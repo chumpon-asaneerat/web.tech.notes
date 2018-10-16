@@ -38,13 +38,14 @@
             ],
             questions: [
                 { qsetId: 'QS001', qseq: 1, qtext: 'Question 1' },
-                { qsetId: 'QS001', qseq: 2, qtext: 'Question 2' }
+                { qsetId: 'QS001', qseq: 1, qtext: 'Question 2' },
+                { qsetId: 'QS001', qseq: 2, qtext: 'Question 3' }
             ],
             periods: [
                 { seq: 1, text: '2018-10-17' },
                 { seq: 2, text: '2018-10-17' }
             ]
-        };        
+        };
         // qsets
         let qsetElem = document.getElementById('tagQSet');
         let tagQSet = new NGui.TagBox(qsetElem);
@@ -56,9 +57,7 @@
         let qsetRemoveItem = (sender, evt) => {
             let item = sender;
             let pName = tagQSet.valueMember;
-            let val = item[pName];
-            let maps = NArray.map(selection.qsets, pName, false);
-            let idx = maps.indexOf(val);
+            let idx = NArray.indexOf(selection.qsets, pName, item);
             if (idx != -1) selection.qsets.splice(idx, 1);
             tagQSet.items = selection.qsets;
         };
@@ -73,6 +72,7 @@
         let quesElem = document.getElementById('tagQues');
         let tagQues = new NGui.TagBox(quesElem);
         tagQues.caption = 'Questions';
+        tagQues.itemSeparator = '';
         let quesClearItems = (sender, evt) => {
             selection.questions.splice(0);
             tagQues.items = selection.questions;
@@ -80,9 +80,7 @@
         let quesRemoveItem = (sender, evt) => {
             let item = sender;
             let pName = tagQues.valueMember;
-            let val = item[pName];
-            let maps = NArray.map(selection.questions, pName, false);
-            let idx = maps.indexOf(val);
+            let idx = NArray.indexOf(selection.questions, pName, item);
             if (idx != -1) selection.questions.splice(idx, 1);
             tagQues.items = selection.questions;
         };
@@ -96,6 +94,7 @@
         let dateElem = document.getElementById('tagDate');
         let tagDate = new NGui.TagBox(dateElem);
         tagDate.caption = 'Date';
+        tagDate.itemSeparator = '-';
         let dateClearItems = (sender, evt) => {
             selection.periods.splice(0);
             tagDate.items = selection.periods;
@@ -103,9 +102,7 @@
         let dateRemoveItem = (sender, evt) => {
             let item = sender;
             let pName = tagDate.valueMember;
-            let val = item[pName];
-            let maps = NArray.map(selection.periods, pName, false);
-            let idx = maps.indexOf(val);
+            let idx = NArray.indexOf(selection.periods, pName, item);
             if (idx != -1) selection.periods.splice(idx, 1);
             tagDate.items = selection.periods;
         };

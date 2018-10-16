@@ -272,20 +272,28 @@
     /* font-weight: bold; */
     background-color: #119911;
     border-radius: 5px;
+    cursor: pointer;
+}
+
+.tag-box .tag-right-col .tag-seperator {
+    display: inline-block;
+    margin: 0 3px auto;
+    user-select: none;
 }
 
 .tag-box .tag-right-col .tag-item.invalid {
     background-color: dimgray;
+    user-select: none;
 }
 
 .tag-box .tag-right-col .tag-item .tag-text {
     display: inline-block;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 3px;
     padding-bottom: 1px;
     margin-left: 0.2em;
     color: whitesmoke;
-    cursor: default;
+    cursor: pointer;
 }
 
 .tag-box .tag-right-col .tag-item .tag-close {
