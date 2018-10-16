@@ -206,6 +206,28 @@ class NArray {
 
         return results;
     };
+    /**
+     * Find index of item in source array.
+     * 
+     * @param {Array} items The source array to find index.
+     * @param {String} member The element property's name to get value.
+     * @param {Object} item The item to find index.
+     * @param {Boolean} lowerCase true for convert value to lowercase.
+     */
+    static indexOf(items, member, item, lowerCase = true) {
+        let idx = -1;
+        if (!items) return idx;
+        if (!item) return idx;
+        let map = NArray.map(items, member, lowerCase);
+        if (!map) return idx;
+        // inline helper function.
+        let isString = value => (typeof value === 'string');
+        let hasMember = (item, name) => (Object.keys(item).indexOf(name) !== -1);
+        let val = (member && hasMember(item, member)) ? item[member] : item;
+        let sVal = (isString(val) && lowerCase) ? String(val).toLowerCase() : val;
+        idx = map.indexOf(sVal);
+        return idx;
+    };
 };
 
 //#endregion
