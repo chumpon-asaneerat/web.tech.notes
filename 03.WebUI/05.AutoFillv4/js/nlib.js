@@ -2106,25 +2106,63 @@ class NGui {};
 
 //#endregion
 
-//#region NGui.AutoComplete and related classes
+//#region NGui.AutoFill and related classes
 
-//#region NGui.AutoComplete
+//#region NGui.AutoFill
 
-NGui.AutoComplete = class {
-    constructor(elem) {
+NGui.AutoFill = class {
+    constructor(elem, options) {
         this._dom = new NDOM(elem);
-        this.init();
+        let opts = (options) ? options : {};
+
+        this._selectionChanged = new EventHandler();
+
+        this.init(opts);
     };
     // private methods.
-    init() {
+    init(options) {
+    };
+    raiseSelectionChanged() {
+        if (this._selectionChanged) this._selectionChanged.invoke(this, EventArgs.Empty);
+    };
+    // HTML Element Events
+    click(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.focus();
+        return false;
     };
     // public methods.
-    refresh() {
+    focus() {
+    };
+    get isdroped() {
+    }
+    dropdown() {
+    };
+    close() {
+    };
+    refresh() { 
+    };
+    selectItem(item) {
+    };
+    unselectItem(item) {
+    };
+    selectAll() {
+    };
+    unselectAll() {
     };
     // public properties.
     // dom and HTMLElement access.
     get dom() { return this._dom; }
     get elem() { return (this._dom) ? this._dom.elem : null; }
+    get currentItems() {
+        return null;
+    }
+    get currentParts() {
+        return null;
+    }
+    // public event
+    get selectionChanged() { return this._selectionChanged; }
 };
 
 //#endregion
