@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Search suggestions.</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css">
+    <link rel="stylesheet" href="css/nlib.css">
+</head>
+<body>
+    <h3>Search suggestions.</h3>
+    <!-- Concept -->
+    <div style="display: block; margin:0 auto; margin-top: 10px; width: 80%;">
+        <div>
+            <div id="tagQSet"></div>
+            <div id="tagQues"></div>
+            <div id="tagDate"></div>
+            <div id="tagItem"></div>
+        </div>
+        <div id="txtSearch1"></div>
+        <button style="display: inline-block; margin: 0 auto; padding: 0; width: 10%;">Search</button>
+        <h4 id="outResult">Result:</h4>
+    </div>
+    <hr/>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin fermentum ligula vel hendrerit porta. Aenean lectus mi,
+    mollis a lorem quis, dignissim facilisis erat. Donec quis tempus quam, in fermentum elit. Nullam auctor libero et
+    fringilla tempor. Etiam ultrices quam rhoncus ante mollis tempus. Nullam luctus elementum lorem, vitae euismod metus
+    sodales eget. Aliquam feugiat metus eu urna sollicitudin vestibulum. </p>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.11.1/riot+compiler.min.js"></script>
+    <script src="js/nlib.js"></script>
+    <script>
+        let source = {
+            items : [
+                { id: 'A1', name: 'Apple' },
+                { id: 'A2', name: 'Applicot' },
+                { id: 'A3', name: 'Action' },
+                { id: 'A4', name: 'Bison' },
+                { id: 'A5', name: 'Elephen' },
+                { id: 'A6', name: 'Eleven' },
+                { id: 'A7', name: 'Boston' },
+                { id: 'A8', name: 'CPP' },
+                { id: 'A9', name: 'Capture' },
+                { id: 'A10', name: 'Tiger' }
+            ]
+        };
+
+        let selection = {
+            qsets : [
+                { qsetId: 'QS001', qSetText: 'Set 1' }
+            ],
+            questions: [
+                { qsetId: 'QS001', qseq: 1, qtext: 'Question 1' },
+                { qsetId: 'QS001', qseq: 1, qtext: 'Question 2' },
+                { qsetId: 'QS001', qseq: 2, qtext: 'Question 3' }
+            ],
+            periods: [
+                { seq: 1, text: '2018-10-17' },
+                { seq: 2, text: '2018-10-17' }
+            ],
+            items : []
+        };
+        // qsets
+        let qsetElem = document.getElementById('tagQSet');
+        let tagQSet = new NGui.TagBox(qsetElem);
+        tagQSet.caption = 'QSet';
+        let qsetClearItems = (sender, evt) => { 
+            selection.qsets.splice(0);
+            tagQSet.items = selection.qsets;
+        };
+        let qsetRemoveItem = (sender, evt) => {
+            let item = sender;
+            let pName = tagQSet.valueMember;
+            let idx = NArray.indexOf(selection.qsets, pName, item);
+            if (idx != -1) selection.qsets.splice(idx, 1);
+            tagQSet.items = selection.qsets;
+        };
+        // setup handlers
+        tagQSet.clearItems.add(qsetClearItems);
+        tagQSet.removeItem.add(qsetRemoveItem);
+        // binding
+        tagQSet.valueMember = 'qSetText';
+        tagQSet.items = selection.qsets;
+
+        // questions
+        let quesElem = document.getElementById('tagQues');
+        let tagQues = new NGui.TagBox(quesElem);
+        tagQues.caption = 'Questions';
+        tagQues.itemSeparator = '';
+        let quesClearItems = (sender, evt) => {
+            selection.questions.splice(0);
+            tagQues.items = selection.questions;
+        };
+        let quesRemoveItem = (sender, evt) => {
+            let item = sender;
+            let pName = tagQues.valueMember;
+            let idx = NArray.indexOf(selection.questions, pName, item);
+            if (idx != -1) selection.questions.splice(idx, 1);
+            tagQues.items = selection.questions;
+        };
+        // setup handlers
+        tagQues.clearItems.add(quesClearItems);
+        tagQues.removeItem.add(quesRemoveItem);
+        // binding
+        tagQues.valueMember = 'qtext';
+        tagQues.items = selection.questions;
+
+        // date
+        let dateElem = document.getElementById('tagDate');
+        let tagDate = new NGui.TagBox(dateElem);
+        tagDate.caption = 'Date';
+        tagDate.itemSeparator = '-';
+        let dateClearItems = (sender, evt) => {
+            selection.periods.splice(0);
+            tagDate.items = selection.periods;
+        };
+        let dateRemoveItem = (sender, evt) => {
+            let item = sender;
+            let pName = tagDate.valueMember;
+            let idx = NArray.indexOf(selection.periods, pName, item);
+            if (idx != -1) selection.periods.splice(idx, 1);
+            tagDate.items = selection.periods;
+        };
+        // setup handlers
+        tagDate.clearItems.add(dateClearItems);
+        tagDate.removeItem.add(dateRemoveItem);
+        // binding
+        tagDate.valueMember = 'text';
+        tagDate.items = selection.periods;
+
+        // item
+        let itemElem = document.getElementById('tagItem');
+        let tagItem = new NGui.TagBox(itemElem);
+        tagItem.caption = 'Items';
+        tagItem.itemSeparator = '';
+        let itemClearItems = (sender, evt) => {
+            selection.items.splice(0);
+            tagItem.items = selection.items;
+        };
+        let itemRemoveItem = (sender, evt) => {
+            let item = sender;
+            let pName = tagItem.valueMember;
+            let idx = NArray.indexOf(selection.items, pName, item);
+            if (idx != -1) selection.items.splice(idx, 1);
+            tagItem.items = selection.items;
+        };
+        // setup handlers
+        tagItem.clearItems.add(itemClearItems);
+        tagItem.removeItem.add(itemRemoveItem);
+        // binding
+        tagItem.valueMember = 'name';
+        tagItem.items = selection.items;
+
+        let searchElem = document.getElementById('txtSearch1');
+        let opts = {
+            buttons: [{
+                name: 'main-menu',
+                align: 'left',
+                css: { class: 'fas fa-caret-square-down' },
+                tooltip: 'Main Menu',
+                click: function (evt, autofill, button) {
+                    //console.log(autofill, button);
+                    //console.log('Main Menu click.');
+                }
+            }, {
+                name: 'select-all',
+                align: 'right',
+                css: { class: 'fas fa-bars' },
+                tooltip: 'Select all',
+                click: function (evt, autofill, button) {
+                    //autofill.selectAll();
+                }
+            }]
+        }
+
+        let autofill = new NGui.AutoFill(searchElem, opts);
+        autofill.valueMember = 'name';
+        autofill.hint = 'Item:';
+        //autofill.hint = '';
+        autofill.datasource = source.items;
+
+        let updateSource = (selectItem) => {
+            selection.items.push(selectItem);
+            tagItem.items = selection.items;
+            let ds = NArray.exclude(source.items, selection.items, 'name', true)
+            autofill.datasource = ds;
+            console.log(ds);
+            console.log(selection.items)
+            autofill.refresh();
+        };
+
+        let onSelectItem = (sender, evt) => { 
+            //console.log(evt.item);
+            updateSource(evt.item);            
+        };
+        autofill.onSelectItem.add(onSelectItem);
+    </script>
+</body>
+</html>
