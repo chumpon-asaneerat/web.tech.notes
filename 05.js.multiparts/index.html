@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script id="part1">
+            console.log('part 1 loaded..');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Javascript multiple parts.</title>
+</head>
+<body>
+    <script id="part2">
+        console.log('part 2 loaded..');
+        window.nlib = {
+            showme: function() { console.log('hello!!'); }
+        };
+    </script>
+    <h3>Javascript multiple parts</h3>
+
+    <script id="part3">
+        console.log('part 3 loaded..');
+        let p2 = document.querySelector('#part2');
+        //console.log('parent:', p2.parentNode);
+        p2.parentNode.removeChild(p2);
+        console.log('part 2 removed..');
+    </script>
+    <!--
+    <script src="js/nlib-scaling.js"></script>
+    -->
+    <script>
+        nlib.showme();
+    </script>
+</body>
+</html>
