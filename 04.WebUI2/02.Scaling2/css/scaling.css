@@ -1,0 +1,44 @@
+h3 {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.half-scale {
+    transform-origin: 0 0;
+    transform: scale(0.5);
+}
+
+.two-fold-scale {
+    transform-origin: 0 0;
+    transform: scale(2);
+}
+
+#obj1 {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    width: 200px;
+    height: 100px;
+    border: 1px solid navy;
+    background: #A324A3;
+}
+
+#obj2 {
+    position: absolute;
+    left: 500px;
+    top: 100px;
+    width: 200px;
+    height: 100px;
+    border: 1px solid silver;
+    background: #71649A;
+}
+
+#obj3 {
+    position: absolute;
+    left: 500px;
+    top: 300px;
+    width: 200px;
+    height: 100px;
+    border: 1px solid silver;
+    background: #8184FA;
+}
