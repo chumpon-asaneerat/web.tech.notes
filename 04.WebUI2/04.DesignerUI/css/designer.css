@@ -40,6 +40,14 @@
     border: 1px solid #fc664b;
 }
 
+#obj4 {
+    left: 350px;
+    top: 20px;
+    height: 100px;
+    width: 100px;
+    border: 1px solid #fc664b;
+}
+
 .hotspot {
     position: absolute;
     display: none;

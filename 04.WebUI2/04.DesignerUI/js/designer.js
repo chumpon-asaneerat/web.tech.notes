@@ -1,3 +1,98 @@
+class NHotspot {
+    constructor(elem) {
+        this._elem = elem;
+
+        this._state = { 
+            onDrag: false,
+            start: { x: -1, y : -1 },
+            dx: 0,
+            dy: 0
+        };
+
+        let self = this;
+        this._elem.addEventListener('mousedown', self.mdown.bind(this));
+        this._elem.addEventListener('mousemove', self.mmove.bind(this));
+        this._elem.addEventListener('mouseup', self.mup.bind(this));
+    }
+
+    getEventElement(e) {
+        let el, evt = e ? e:event;
+        if (evt.srcElement)  el = evt.srcElement;
+        else if (evt.target) el = evt.target;
+        return el;
+    }
+
+    mdown(e) {
+        let el = this.getEventElement(e);
+        if (!el) return;
+        this._state.onDrag = true;
+
+        let x = event.clientX;
+        let y = event.clientY;
+        let clientRect = this._elem.getBoundingClientRect();
+
+        this._state.start.x = x - clientRect.left;
+        this._state.start.y = y - clientRect.top;
+        this._state.dx = 0;
+        this._state.dy = 0;
+
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+    mmove(e) {
+        let el = this.getEventElement(e);
+        if (!el) return;
+        if (this._state.onDrag) {
+            //let x = el.clientX;
+            //let y = el.clientY;
+            let x = event.clientX;
+            let y = event.clientY;
+
+            this._state.dx = x - this._state.start.x;
+            this._state.dy = y - this._state.start.y;
+
+            this.moveTo(this._state.dx, this._state.dy);
+
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+    mup(e) {
+        let el = this.getEventElement(e);
+        if (!el) return;
+        //let x = el.clientX;
+        //let y = el.clientY;
+        let x = event.clientX;
+        let y = event.clientY;
+        this._state.onDrag = false;
+
+        this._state.dx = x - this._state.start.x;
+        this._state.dy = y - this._state.start.y;
+
+        this.moveTo(this._state.dx, this._state.dy);
+
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    moveTo(x, y) {
+        //let rect = this._elem.getBoundingClientRect();
+        //console.log('Rect:', rect);
+        //this._elem.style.left = rect.left + dx + 'px';
+        //this._elem.style.top = rect.top + dy + 'px';
+        this._elem.style.left = x + 'px';
+        this._elem.style.top = y + 'px';
+    }
+    
+    release() {        
+        this._elem.removeEventListener('mousedown', self.mdown );
+        this._elem.removeEventListener('mousemove', self.mmove );
+        this._elem.removeEventListener('mouseup', self.mup );
+    }
+};
 
 class NDesigner {
     constructor(elem) {
@@ -25,7 +120,7 @@ class NDesigner {
         if (evt.srcElement)  el = evt.srcElement;
         else if (evt.target) el = evt.target;
 
-        console.log(`designer mouse down:`, el);
+        //console.log(`designer mouse down:`, el);
         // The design-object mouse down event already handle mouse event if mouse is in 
         // its region. So if designer received event that mean no object selected.
         this.selectedObj = null;
@@ -60,12 +155,14 @@ class NDesigner {
     get selectedObj() { return this._selectedObj; }
     set selectedObj(value) {
         if (this._selectedObj !== value) {
+            /*
             if (value) {
                 console.log('new object selelected. id:', value.element.id);
             }
             else {
                 console.log('no object selelected.');
             }
+            */
 
             this._objs.forEach(obj => {
                 if (obj !== value) obj.deselect();
@@ -180,4 +277,7 @@ class NDesignObject {
     dsgner.add(obj3);
 
     obj1.select();
+
+    let obj4 = document.getElementById('obj4');
+    let hs4 = new NHotspot(obj4);
 })();
