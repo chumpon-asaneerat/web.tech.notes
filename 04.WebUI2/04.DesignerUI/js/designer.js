@@ -26,6 +26,9 @@ class NDesigner {
         else if (evt.target) el = evt.target;
 
         console.log(`designer mouse down:`, el);
+        // The design-object mouse down event already handle mouse event if mouse is in 
+        // its region. So if designer received event that mean no object selected.
+        this.selectedObj = null;
     };
     onMouseMove(e) {
         //console.log(`mouse move:`);
@@ -57,7 +60,12 @@ class NDesigner {
     get selectedObj() { return this._selectedObj; }
     set selectedObj(value) {
         if (this._selectedObj !== value) {
-            console.log('new object selelected. id:', value.element.id);
+            if (value) {
+                console.log('new object selelected. id:', value.element.id);
+            }
+            else {
+                console.log('no object selelected.');
+            }
 
             this._objs.forEach(obj => {
                 if (obj !== value) obj.deselect();
@@ -133,6 +141,7 @@ class NDesignObject {
             this._elem.appendChild(this.createHotspot('resize', 's'));
             this._elem.appendChild(this.createHotspot('resize', 'se'));
             this._elem.appendChild(this.createHotspot('resize', 'sw'));
+            this._elem.appendChild(this.createHotspot('resize', 'mv'));
             // set selected object.
             if (!this.designer) return;
             this.designer.selectedObj = this;
@@ -154,6 +163,7 @@ class NDesignObject {
 
 ;(function() {
     console.log('designer init...');
+    
     let dsgner = new NDesigner(document.getElementById('dsgn1'));
     console.log(dsgner);
 
@@ -164,6 +174,10 @@ class NDesignObject {
     let obj2 = new NDesignObject();
     obj2.element.id = 'obj2';
     dsgner.add(obj2);
+
+    let obj3 = new NDesignObject();
+    obj3.element.id = 'obj3';
+    dsgner.add(obj3);
 
     obj1.select();
 })();

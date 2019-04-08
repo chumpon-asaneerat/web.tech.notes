@@ -32,6 +32,14 @@
     border: 1px solid #83d18a;
 }
 
+#obj3 {
+    left: 240px;
+    top: 20px;
+    height: 100px;
+    width: 100px;
+    border: 1px solid #fc664b;
+}
+
 .hotspot {
     position: absolute;
     display: none;
@@ -99,3 +107,28 @@
     left: -4px;
     cursor: w-resize;
 }
+
+.design-object[selected] .hotspot[type="resize"][direction="mv"] {
+    top: -10px;
+    left: 0%;
+    margin-left: 3px;
+    height: 6px;
+    width: 7px;
+    border-radius: 2px;
+    border-width: 1px;
+    background: transparent;
+    cursor: move;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="mv"]:after {
+    position: absolute;
+    left: 0;
+    top: -1px;
+    margin-left: 1px;
+    font-size: 5pt;
+    font-weight: bold;
+    color: cornflowerblue;
+    content: '\292B';
+    transform: rotate(45deg);
+}
+
