@@ -1,0 +1,101 @@
+.designer {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    left: 5px;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+
+    border: 1px solid red;
+}
+
+.design-object {
+    position: absolute;
+    margin: 0;
+    padding: 0;    
+}
+
+#obj1 {    
+    left: 20px;
+    top: 20px;
+    height: 100px;
+    width: 100px;
+    border: 1px solid #d95bd6;
+}
+
+#obj2 {    
+    left: 130px;
+    top: 20px;
+    height: 100px;
+    width: 100px;
+    border: 1px solid #83d18a;
+}
+
+.hotspot {
+    position: absolute;
+    display: none;
+    margin: 0 auto;
+    padding: 0;
+    height: 5px;
+    width: 5px;
+    background: cornflowerblue;
+    border: 1px solid royalblue;
+    border-radius: 50%;
+}
+
+.design-object[selected] .hotspot {
+    display: inline-block;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="n"] {
+    top: -4px;
+    left: 50%;
+    margin-left: -4px;
+    cursor: n-resize;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="nw"] {
+    top: -4px;
+    left: -4px;
+    cursor: nw-resize;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="ne"] {
+    top: -4px;
+    right: -4px;
+    cursor: ne-resize;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="s"] {
+    bottom: -4px;
+    left: 50%;
+    margin-left: -4px;
+    cursor: s-resize;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="sw"] {
+    bottom: -4px;
+    left: -4px;
+    cursor: sw-resize;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="se"] {
+    bottom: -4px;
+    right: -4px;
+    cursor: se-resize;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="e"] {
+    top: 50%;
+    margin-top: -4px;
+    right: -4px;
+    cursor: e-resize;
+}
+
+.design-object[selected] .hotspot[type="resize"][direction="w"] {
+    top: 50%;
+    margin-top: -4px;
+    left: -4px;
+    cursor: w-resize;
+}
