@@ -2,17 +2,8 @@ class NHotspot {
     constructor(elem) {
         this._elem = elem;
 
-        this._state = { 
-            onDrag: false,
-            start: { x: -1, y : -1 },
-            dx: 0,
-            dy: 0
-        };
-
         let self = this;
-        this._elem.addEventListener('mousedown', self.mdown.bind(this));
-        this._elem.addEventListener('mousemove', self.mmove.bind(this));
-        this._elem.addEventListener('mouseup', self.mup.bind(this));
+        this._elem.addEventListener('mousedown', self.mdown.bind(this), true);
     }
 
     getEventElement(e) {
@@ -23,74 +14,55 @@ class NHotspot {
     }
 
     mdown(e) {
-        let el = this.getEventElement(e);
-        if (!el) return;
-        this._state.onDrag = true;
-
-        let x = event.clientX;
-        let y = event.clientY;
-        let clientRect = this._elem.getBoundingClientRect();
-
-        this._state.start.x = x - clientRect.left;
-        this._state.start.y = y - clientRect.top;
-        this._state.dx = 0;
-        this._state.dy = 0;
-
         e.preventDefault();
         e.stopPropagation();
+
+        this.moveToCursor();
+
+        let self = this;
+        this._elem.addEventListener('mousemove', self.mmove.bind(self));
+        this._elem.addEventListener('mouseup', self.mup.bind(self));
+        this._elem.ondragstart = function() { return false; }
+
         return false;
     }
     mmove(e) {
-        let el = this.getEventElement(e);
-        if (!el) return;
-        if (this._state.onDrag) {
-            //let x = el.clientX;
-            //let y = el.clientY;
-            let x = event.clientX;
-            let y = event.clientY;
-
-            this._state.dx = x - this._state.start.x;
-            this._state.dy = y - this._state.start.y;
-
-            this.moveTo(this._state.dx, this._state.dy);
-
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-    mup(e) {
-        let el = this.getEventElement(e);
-        if (!el) return;
-        //let x = el.clientX;
-        //let y = el.clientY;
-        let x = event.clientX;
-        let y = event.clientY;
-        this._state.onDrag = false;
-
-        this._state.dx = x - this._state.start.x;
-        this._state.dy = y - this._state.start.y;
-
-        this.moveTo(this._state.dx, this._state.dy);
-
         e.preventDefault();
         e.stopPropagation();
+
+        this.moveToCursor();
+
+        return false;
+    }
+    mup(e) {
+        console.log('hotspot mouse up:');
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.moveToCursor();
+
+        let self = this;
+        this._elem.removeEventListener('mousemove', self.mmove.bind(self));
+        this._elem.removeEventListener('mouseup', self.mup.bind(self));
+        this._elem.ondragstart = null;
+
         return false;
     }
 
-    moveTo(x, y) {
-        //let rect = this._elem.getBoundingClientRect();
-        //console.log('Rect:', rect);
-        //this._elem.style.left = rect.left + dx + 'px';
-        //this._elem.style.top = rect.top + dy + 'px';
-        this._elem.style.left = x + 'px';
-        this._elem.style.top = y + 'px';
+    moveToCursor() {
+        let rect = this._elem.getBoundingClientRect();
+        let x = event.clientX;
+        let y = event.clientY;
+
+        console.log('rect:', rect);
+        console.log('x:', x, ', y:', y);
+
+        this._elem.style.left = x - (rect.width / 2) + 'px';
+        this._elem.style.top = y - (rect.height / 2) + 'px';
     }
     
     release() {        
         this._elem.removeEventListener('mousedown', self.mdown );
-        this._elem.removeEventListener('mousemove', self.mmove );
-        this._elem.removeEventListener('mouseup', self.mup );
     }
 };
 
@@ -280,4 +252,24 @@ class NDesignObject {
 
     let obj4 = document.getElementById('obj4');
     let hs4 = new NHotspot(obj4);
+    /*
+    var el = obj4;
+    if (acceptsTouch()) {
+        el.addEventListener('touchstart', function(e) {
+            drag.startMoving(this, 'container', event);
+        }, false);
+    
+        el.addEventListener('touchend', function(e) {
+            drag.stopMoving(this, 'container', event);
+        }, false);
+    } else {
+        el.addEventListener('mousedown', function(e) {
+            drag.startMoving(this, 'container', event);
+        }, false);
+    
+        el.addEventListener('mouseup', function(e) {
+            drag.stopMoving(this, 'container', event);
+        }, false);
+    }
+    */    
 })();
