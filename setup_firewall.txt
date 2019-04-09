@@ -1,0 +1,30 @@
+Run cmd.exe:
+Press Windows+R on a keyboard.
+Type "cmd" without quotes and press enter.
+Check if node is installed successfuly by typing "node -v" without quotes, it should respond with "v#.#.#" where # stands for number
+Restart computer if "node -v" does not respond correctly.
+Try to automatically install all dependencies via "npm install" command
+If and only if previous step failed install dependencies manually by executing following commands:
+Run "npm install"
+"npm install express -g"
+"npm install url -g"
+"npm install fresh -g"
+"npm install cookie -g"
+"npm install methods -g"
+"npm install crc -g"
+"npm install send -g"
+"npm install connect -g"
+"npm install commander -g"
+Attempt to run server by executing "node app" withing server root folder.
+Allow access to that application through the Windows Firewall:
+Advanced settings of a Windows Firewall: "Control Panel > System Ecurity > Windows Firewall > Advanced Settings".
+Create new rule.
+Select "Port" and press "Next".
+Allow TCP and port your are attempting to expose (default 3000, you might want to expose 80), and press "Next".
+Select "Allow the connection" and press "Next".
+Check all: Domain, Private, Public and press "Next".
+Type "Acne Challenge Server" as name, and press "Done".
+Restart OS
+Open cmd : Windows+R, type "cmd" and hit "Enter".
+Run "node app" from within highscores directory.
+Server is ready.
