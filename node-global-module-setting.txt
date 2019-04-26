@@ -1,0 +1,46 @@
+In Windows, the global install path is actually in your user's profile directory
+
+%USERPROFILE%\AppData\Roaming\npm
+%USERPROFILE%\AppData\Roaming\npm-cache
+
+WARNING: If you're doing timed events or other automation as a different user, make sure you run npm install as that user. 
+Some modules/utilities should be installed globally.
+
+INSTALLER BUGS: You may have to create these directories or add the ...\npm directory to your users path yourself.
+To change the "global" location for all users to a more appropriate shared global location %ALLUSERSPROFILE%\(npm|npm-cache) 
+do this as an administrator):
+
+create an [NODE_INSTALL_PATH]\etc\ directory
+
+this is needed before you try npm config --global ... actions
+
+create the global (admin) location(s) for npm modules
+
+C:\ProgramData\npm-cache - npm modules will go here
+C:\ProgramData\npm - binary scripts for globally installed modules will go here
+C:\ProgramData\npm\node_modules - globally installed modules will go here
+
+set the permissions appropriately
+
+administrators: modify
+authenticated users: read/execute
+
+Set global configuration settings (Administrator Command Prompt)
+
+npm config --global set prefix "C:\ProgramData\npm"
+npm config --global set cache "C:\ProgramData\npm-cache"
+
+Add C:\ProgramData\npm to your System's Path environment variable
+If you want to change your user's "global" location to %LOCALAPPDATA%\(npm|npm-cache) path instead:
+
+Create the necessary directories
+
+C:\Users\YOURNAME\AppData\Local\npm-cache - npm modules will go here
+C:\Users\YOURNAME\AppData\Local\npm - binary scripts for installed modules will go here
+C:\Users\YOURNAME\AppData\Local\npm\node_modules - globally installed modules will go here
+
+Configure npm
+npm config set prefix "C:\Users\YOURNAME\AppData\Local\npm"
+npm config set cache "C:\Users\YOURNAME\AppData\Local\npm-cache"
+Add the new npm path to your environment's PATH.
+setx PATH "%PATH%;C:\Users\YOURNAME\AppData\Local\npm"
