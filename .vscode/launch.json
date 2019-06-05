@@ -19,7 +19,8 @@
             "url": "http://localhost:8800",
             "urlFilter": "${workspaceFolder}/*",
             "webRoot": "${workspaceRoot}",
-            "file": "${workspaceFolder}/04.WebUI2/05.DesignerUI2/index.html",
+            //"file": "${workspaceFolder}/04.WebUI2/05.DesignerUI2/index.html",
+            "file": "${workspaceFolder}",
             "smartStep": true
         }
     ]
