@@ -17,8 +17,8 @@
         <a href="#">Contact</a>
     </div>
     <!-- Use any element to open the sidenav -->
-    <button onclick="openNav()">open</button>
     <div id="main">
+        <button onclick="toggle()">toggle</button>
         <h1>The Main Content</h1>
     </div>
     <script src="js/app.js"></script>
@@ -31,6 +31,12 @@
         closeNav = () =>  {
             document.getElementById("mySidenav").style.width = "0";
             document.getElementById("main").style.marginLeft = "0";
+        }
+        let shown = false;
+        toggle = () => {
+            if (shown) 
+                closeNav()
+            else openNav()
         }
     </script>
 </body>
